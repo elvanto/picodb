@@ -15,6 +15,8 @@ use PicoDb\Builder\UpdateBuilder;
  * @author  Frederic Guillot
  *
  * @method   $this   addCondition($sql)
+ * @method   $this   beginAnd()
+ * @method   $this   closeAnd()
  * @method   $this   beginOr()
  * @method   $this   closeOr()
  * @method   $this   eq($column, $value)
