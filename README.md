@@ -460,6 +460,21 @@ $db->table('mytable')
     ->findAll();
 ```
 
+Further AND conditions can be embedded within an OR:
+
+```php
+$db->table('mytable')
+    ->beginOr()
+    ->like('column2', '%mytable')
+    ->beginAnd()
+    ->gte('column1', 3)
+    ->eq('column5', 'titi')
+    ->closeAnd()
+    ->closeOr()
+    ->findAll();
+```
+
+
 ### Debugging
 
 Log generated queries:
