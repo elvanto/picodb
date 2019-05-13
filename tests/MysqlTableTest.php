@@ -216,6 +216,14 @@ class MysqlTableTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(array(4), $table->getConditionBuilder()->getValues());
     }
 
+    public function testAndConditions()
+    {
+        $table = $this->db->table('test');
+
+        $this->assertEquals('SELECT * FROM `test`   WHERE (`a` IS NOT NULL OR (`b` = ? AND `c` >= ?))', $table->beginOr()->notNull('a')->beginAnd()->eq('b', 2)->gte('c', 5)->closeAnd()->closeOr()->buildSelectQuery());
+        $this->assertEquals(array(2, 5), $table->getConditionBuilder()->getValues());
+    }
+
     public function testOrConditions()
     {
         $table = $this->db->table('test');

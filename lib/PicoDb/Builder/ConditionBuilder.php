@@ -38,12 +38,12 @@ class ConditionBuilder
     private $conditions = array();
 
     /**
-     * SQL OR conditions
+     * SQL embedded AND/OR conditions
      *
      * @access private
-     * @var    OrConditionBuilder[]
+     * @var    LogicConditionBuilder[]
      */
-    private $orConditions = array();
+    private $embeddedConditions = array();
 
     /**
      * SQL condition offset
@@ -51,7 +51,7 @@ class ConditionBuilder
      * @access private
      * @var int
      */
-    private $orConditionOffset = 0;
+    private $embeddedConditionOffset = 0;
 
     /**
      * Constructor
@@ -105,11 +105,39 @@ class ConditionBuilder
      */
     public function addCondition($sql)
     {
-        if ($this->orConditionOffset > 0) {
-            $this->orConditions[$this->orConditionOffset]->withCondition($sql);
+        if ($this->embeddedConditionOffset > 0) {
+            $this->embeddedConditions[$this->embeddedConditionOffset]->withCondition($sql);
         }
         else {
             $this->conditions[] = $sql;
+        }
+    }
+
+    /**
+     * Start AND condition
+     *
+     * @access public
+     */
+    public function beginAnd()
+    {
+        $this->embeddedConditionOffset++;
+        $this->embeddedConditions[$this->embeddedConditionOffset] = new LogicConditionBuilder('AND');
+    }
+
+    /**
+     * Close AND condition
+     *
+     * @access public
+     */
+    public function closeAnd()
+    {
+        $condition = $this->embeddedConditions[$this->embeddedConditionOffset]->build();
+        $this->embeddedConditionOffset--;
+
+        if ($this->embeddedConditionOffset > 0) {
+            $this->embeddedConditions[$this->embeddedConditionOffset]->withCondition($condition);
+        } else {
+            $this->conditions[] = $condition;
         }
     }
 
@@ -120,8 +148,8 @@ class ConditionBuilder
      */
     public function beginOr()
     {
-        $this->orConditionOffset++;
-        $this->orConditions[$this->orConditionOffset] = new OrConditionBuilder();
+        $this->embeddedConditionOffset++;
+        $this->embeddedConditions[$this->embeddedConditionOffset] = new LogicConditionBuilder('OR');
     }
 
     /**
@@ -131,11 +159,11 @@ class ConditionBuilder
      */
     public function closeOr()
     {
-        $condition = $this->orConditions[$this->orConditionOffset]->build();
-        $this->orConditionOffset--;
+        $condition = $this->embeddedConditions[$this->embeddedConditionOffset]->build();
+        $this->embeddedConditionOffset--;
 
-        if ($this->orConditionOffset > 0) {
-            $this->orConditions[$this->orConditionOffset]->withCondition($condition);
+        if ($this->embeddedConditionOffset > 0) {
+            $this->embeddedConditions[$this->embeddedConditionOffset]->withCondition($condition);
         } else {
             $this->conditions[] = $condition;
         }

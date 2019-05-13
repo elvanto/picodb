@@ -8,8 +8,13 @@ namespace PicoDb\Builder;
  * @package PicoDb\Builder
  * @author  Frederic Guillot
  */
-class OrConditionBuilder
+class LogicConditionBuilder
 {
+    /**
+     * @var string
+     */
+    private $type;
+
     /**
      * List of SQL conditions
      *
@@ -17,6 +22,16 @@ class OrConditionBuilder
      * @var string[]
      */
     protected $conditions = array();
+
+    /**
+     * LogicConditionBuilder constructor.
+     *
+     * @param string $type
+     */
+    public function __construct($type)
+    {
+        $this->type = $type;
+    }
 
     /**
      * Add new condition
@@ -38,6 +53,6 @@ class OrConditionBuilder
      */
     public function build()
     {
-        return '('.implode(' OR ', $this->conditions).')';
+        return '('.implode(' '. $this->type .' ', $this->conditions).')';
     }
 }
