@@ -13,13 +13,13 @@ Features
 - Requires only PDO
 - Use prepared statements
 - Handle schema migrations
-- Fully unit tested on PHP 5.3, 5.4, 5.5, 5.6 and 7.0
+- Fully unit tested on PHP 7+
 - License: MIT
 
 Requirements
 ------------
 
-- PHP >= 5.3
+- PHP >= 7.0
 - PDO extension
 - Sqlite, Mssql, Mysql or Postgresql
 
