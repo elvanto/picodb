@@ -1,38 +1,30 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<phpunit bootstrap="vendor/autoload.php"
-         backupGlobals="false"
-         backupStaticAttributes="false"
-         colors="true"
-         verbose="true"
-         convertErrorsToExceptions="true"
-         convertNoticesToExceptions="true"
-         convertWarningsToExceptions="true"
-         processIsolation="false"
-         stopOnFailure="false">
-    <testsuite name="sqlite">
-        <file>tests/UrlParserTest.php</file>
-        <file>tests/SqliteDriverTest.php</file>
-        <file>tests/SqliteDatabaseTest.php</file>
-        <file>tests/SqliteSchemaTest.php</file>
-        <file>tests/SqliteTableTest.php</file>
-    </testsuite>
-    <testsuite name="mysql">
-        <file>tests/UrlParserTest.php</file>
-        <file>tests/MysqlDriverTest.php</file>
-        <file>tests/MysqlDatabaseTest.php</file>
-        <file>tests/MysqlSchemaTest.php</file>
-        <file>tests/MysqlTableTest.php</file>
-    </testsuite>
-    <testsuite name="postgres">
-        <file>tests/UrlParserTest.php</file>
-        <file>tests/PostgresDriverTest.php</file>
-        <file>tests/PostgresDatabaseTest.php</file>
-        <file>tests/PostgresSchemaTest.php</file>
-        <file>tests/PostgresTableTest.php</file>
-    </testsuite>
-    <filter>
-        <whitelist>
-            <directory suffix=".php">src/</directory>
-        </whitelist>
-    </filter>
+<phpunit
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/6.5/phpunit.xsd"
+        colors="true"
+        stopOnError="true"
+        stopOnFailure="true">
+    <testsuites>
+        <testsuite name="sqlite">
+            <file>tests/UrlParserTest.php</file>
+            <file>tests/SqliteDriverTest.php</file>
+            <file>tests/SqliteDatabaseTest.php</file>
+            <file>tests/SqliteSchemaTest.php</file>
+            <file>tests/SqliteTableTest.php</file>
+        </testsuite>
+        <testsuite name="mysql">
+            <file>tests/UrlParserTest.php</file>
+            <file>tests/MysqlDriverTest.php</file>
+            <file>tests/MysqlDatabaseTest.php</file>
+            <file>tests/MysqlSchemaTest.php</file>
+            <file>tests/MysqlTableTest.php</file>
+        </testsuite>
+        <testsuite name="postgres">
+            <file>tests/UrlParserTest.php</file>
+            <file>tests/PostgresDriverTest.php</file>
+            <file>tests/PostgresDatabaseTest.php</file>
+            <file>tests/PostgresSchemaTest.php</file>
+            <file>tests/PostgresTableTest.php</file>
+        </testsuite>
+    </testsuites>
 </phpunit>
