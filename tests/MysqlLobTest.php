@@ -1,8 +1,6 @@
 <?php
 
-require_once __DIR__.'/../vendor/autoload.php';
-
-class MysqlLobTest extends PHPUnit_Framework_TestCase
+class MysqlLobTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var PicoDb\Database

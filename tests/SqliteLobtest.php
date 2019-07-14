@@ -1,10 +1,8 @@
 <?php
 
-require_once __DIR__.'/../vendor/autoload.php';
-
 use PicoDb\Database;
 
-class SqliteLobTest extends PHPUnit_Framework_TestCase
+class SqliteLobTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var PicoDb\Database

@@ -1,9 +1,7 @@
 <?php
-
-require_once __DIR__.'/../vendor/autoload.php';
 require_once __DIR__.'/SchemaFixture.php';
 
-class PostgresSchemaTest extends PHPUnit_Framework_TestCase
+class PostgresSchemaTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var PicoDb\Database

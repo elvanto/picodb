@@ -1,10 +1,9 @@
 <?php
 
-require_once __DIR__.'/../vendor/autoload.php';
 require_once __DIR__.'/SchemaFixture.php';
 require_once __DIR__.'/AlternativeSchemaFixture.php';
 
-class MysqlSchemaTest extends PHPUnit_Framework_TestCase
+class MysqlSchemaTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var PicoDb\Database

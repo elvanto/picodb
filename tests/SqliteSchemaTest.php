@@ -1,9 +1,7 @@
 <?php
-
-require_once __DIR__.'/../vendor/autoload.php';
 require_once __DIR__.'/SchemaFixture.php';
 
-class SqliteSchemaTest extends PHPUnit_Framework_TestCase
+class SqliteSchemaTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var PicoDb\Database
