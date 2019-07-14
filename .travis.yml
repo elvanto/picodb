@@ -10,8 +10,6 @@ php:
   - 7.2
   - 7.3
 
-dist: trusty
-
 before_script:
   - curl -sSfL -o ~/.phpenv/versions/hhvm/bin/phpunit https://phar.phpunit.de/phpunit-6.5.14.phar
   - composer install --no-interaction --prefer-source
