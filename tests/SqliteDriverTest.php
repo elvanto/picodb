@@ -1,10 +1,8 @@
 <?php
 
-require_once __DIR__.'/../vendor/autoload.php';
-
 use PicoDb\Driver\Sqlite;
 
-class SqliteDriverTest extends PHPUnit_Framework_TestCase
+class SqliteDriverTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var PicoDb\Driver\Sqlite

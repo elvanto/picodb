@@ -1,10 +1,8 @@
 <?php
 
-require_once __DIR__.'/../vendor/autoload.php';
-
 use PicoDb\Database;
 
-class PostgresLobTest extends PHPUnit_Framework_TestCase
+class PostgresLobTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var PicoDb\Database

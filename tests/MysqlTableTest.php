@@ -1,11 +1,9 @@
 <?php
 
-require_once __DIR__.'/../vendor/autoload.php';
-
 use PicoDb\Database;
 use PicoDb\Table;
 
-class MysqlTableTest extends PHPUnit_Framework_TestCase
+class MysqlTableTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var PicoDb\Database
