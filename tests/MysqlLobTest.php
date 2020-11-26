@@ -9,7 +9,7 @@ class MysqlLobTest extends \PHPUnit\Framework\TestCase
 
     public function setUp()
     {
-        $this->db = new PicoDb\Database(array('driver' => 'mysql', 'hostname' => 'localhost', 'username' => 'root', 'password' => '', 'database' => 'picodb'));
+        $this->db = new PicoDb\Database(array('driver' => 'mysql', 'hostname' => '127.0.0.1', 'username' => 'root', 'password' => 'rootpassword', 'database' => 'picodb'));
         $this->db->getConnection()->exec('DROP TABLE IF EXISTS large_objects');
         $this->db->getConnection()->exec('CREATE TABLE large_objects (id VARCHAR(20), file_content BLOB)');
         $this->db->getStatementHandler()->withLogging();
