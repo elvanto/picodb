@@ -11,7 +11,7 @@ class PostgresDriverTest extends \PHPUnit\Framework\TestCase
 
     public function setUp()
     {
-        $this->driver = new Postgres(array('hostname' => 'localhost', 'username' => 'root', 'password' => 'rootpassword', 'database' => 'picodb'));
+        $this->driver = new Postgres(array('hostname' => '127.0.0.1', 'username' => 'root', 'password' => 'rootpassword', 'database' => 'picodb'));
         $this->driver->getConnection()->exec('DROP TABLE IF EXISTS foobar');
         $this->driver->getConnection()->exec('DROP TABLE IF EXISTS schema_version');
     }
