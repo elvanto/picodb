@@ -69,13 +69,5 @@ jobs:
         if: steps.composer-cache.outputs.cache-hit != 'true'
         run: composer install --prefer-dist --no-progress --no-suggest
 
-      - name: Setup Database
-        run: |
-          sudo apt update
-          sudo apt install -y default-mysql-client
-          echo 'CREATE DATABASE picodb' | mysql -h 127.0.0.1 -u root -prootpassword
-          sudo apt install postgresql postgresql-contrib
-          echo 'CREATE DATABASE picodb' | psql -U root
-
       - name: Run test suite
         run: ./vendor/bin/phpunit
