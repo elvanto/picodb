@@ -75,7 +75,7 @@ jobs:
           sudo apt install postgresql postgresql-contrib
 
       - name: Run test suite
-        run: ./vendor/bin/phpunit
+        run: ./vendor/bin/phpunit d
 
   test_mysql80:
 
