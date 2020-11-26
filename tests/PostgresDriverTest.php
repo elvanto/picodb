@@ -71,6 +71,6 @@ class PostgresDriverTest extends \PHPUnit\Framework\TestCase
 
     public function testDatabaseVersion()
     {
-        $this->assertStringStartsWith('9.', $this->driver->getDatabaseVersion());
+        $this->assertStringStartsWith('11.', $this->driver->getDatabaseVersion());
     }
 }
