@@ -7,14 +7,87 @@ on:
     branches: [ master ]
 
 jobs:
-  test:
+  test_mysql57:
 
     runs-on: ubuntu-latest
     timeout-minutes: 10
     strategy:
       matrix:
         php-versions: [ '7.0', '7.1', '7.2', '7.3', '7.4' ]
-        mysql-versions: [ '5.7', '8.0' ]
+        mysql-versions: [ '5.7' ]
+    name: PHP ${{ matrix.php-versions }} with MySQL ${{ matrix.mysql-versions }}
+
+    services:
+      mysql:
+        image: mysql:${{ matrix.mysql-versions }}
+        env:
+          MYSQL_USER: root
+          MYSQL_DATABASE: picodb
+          MYSQL_ROOT_PASSWORD: rootpassword
+          MYSQL_HOST: 127.0.0.1
+        ports:
+          [ '3306:3306' ]
+        options: --health-cmd "mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries 10
+
+      postgres:
+        image: postgres:11
+        env:
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: rootpassword
+          POSTGRES_DB: picodb
+        ports:
+          [ '5432:5432' ]
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v2
+        name: Check Out Code
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-versions }}
+          extensions: pdo_mysql, pdo_pgsql, pdo_sqlite
+
+      - name: Validate composer.json and composer.lock
+        run: composer validate
+
+      - name: Cache Composer packages
+        id: composer-cache
+        uses: actions/cache@v2
+        with:
+          path: vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Install dependencies
+        if: steps.composer-cache.outputs.cache-hit != 'true'
+        run: composer install --prefer-dist --no-progress --no-suggest
+
+      - name: Setup Database
+        run: |
+          sudo apt update
+          sudo apt install -y default-mysql-client
+          sudo apt install postgresql postgresql-contrib
+          echo "alter user 'root'@'127.0.0.1' identified with mysql_native_password by 'rootpassword'" | mysql -h 127.0.0.1 -u root -prootpassword
+
+      - name: Run test suite
+        run: ./vendor/bin/phpunit
+
+
+  test_mysql80:
+
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        php-versions: [ '7.4' ]
+        mysql-versions: [ '8.0' ]
     name: PHP ${{ matrix.php-versions }} with MySQL ${{ matrix.mysql-versions }}
 
     services:
