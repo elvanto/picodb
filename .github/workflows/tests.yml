@@ -68,12 +68,6 @@ jobs:
         if: steps.composer-cache.outputs.cache-hit != 'true'
         run: composer install --prefer-dist --no-progress --no-suggest
 
-      - name: Setup Database
-        run: |
-          sudo apt update
-          sudo apt install -y default-mysql-client
-          sudo apt install postgresql postgresql-contrib
-
       - name: Run test suite
         run: ./vendor/bin/phpunit
 
@@ -137,12 +131,6 @@ jobs:
       - name: Install dependencies
         if: steps.composer-cache.outputs.cache-hit != 'true'
         run: composer install --prefer-dist --no-progress --no-suggest
-
-      - name: Setup Database
-        run: |
-          sudo apt update
-          sudo apt install -y default-mysql-client
-          sudo apt install postgresql postgresql-contrib
 
       - name: Run test suite
         run: ./vendor/bin/phpunit
