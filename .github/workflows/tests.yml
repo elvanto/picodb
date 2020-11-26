@@ -19,15 +19,16 @@ jobs:
 
     services:
       mysql:
-        image: mysql:${{ matrix.mysql-versions }}
+        image: bitnami/mysql:${{ matrix.mysql-versions }}
         env:
           MYSQL_USER: root
           MYSQL_DATABASE: picodb
           MYSQL_ROOT_PASSWORD: rootpassword
           MYSQL_HOST: 127.0.0.1
+          MYSQL_AUTHENTICATION_PLUGIN: mysql_native_password
         ports:
           [ '3306:3306' ]
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=10 --entrypoint sh mysql:8 -c "exec docker-entrypoint.sh mysqld --default-authentication-plugin=mysql_native_password"
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=10
 
       postgres:
         image: postgres:11
