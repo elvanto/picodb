@@ -30,10 +30,13 @@ jobs:
         options: --health-cmd "mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries 10
 
       postgres:
-        image: postgres
+        image: postgres:11
         env:
-          POSTGRES_USERNAME: root
+          POSTGRES_USER: root
           POSTGRES_PASSWORD: rootpassword
+          POSTGRES_DB: test
+        ports:
+          [ '5432:5432' ]
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
