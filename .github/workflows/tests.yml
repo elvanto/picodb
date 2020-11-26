@@ -72,7 +72,7 @@ jobs:
           sudo apt install -y default-mysql-client
           echo 'CREATE DATABASE picodb' | mysql -h 127.0.0.1 -u root -prootpassword
           sudo apt install postgresql postgresql-contrib
-          psql -c 'create database picodb;' -U root
+          echo 'CREATE DATABASE picodb' | psql -U root
 
       - name: Run test suite
         run: ./vendor/bin/phpunit
