@@ -20,7 +20,6 @@ jobs:
     services:
       mysql:
         image: mysql:${{ matrix.mysql-versions }}
-        command: --default-authentication-plugin=mysql_native_password
         env:
           MYSQL_USER: root
           MYSQL_DATABASE: picodb
@@ -75,8 +74,7 @@ jobs:
           sudo apt update
           sudo apt install -y default-mysql-client
           sudo apt install postgresql postgresql-contrib
-          echo "alter user 'root'@'127.0.0.1' identified with mysql_native_password by ''" | mysql -h 127.0.0.1 -u root -prootpassword
-
+          echo "alter user 'root'@'127.0.0.1' identified with mysql_native_password by 'rootpassword'" | mysql -h 127.0.0.1 -u root -prootpassword
 
       - name: Run test suite
         run: ./vendor/bin/phpunit
