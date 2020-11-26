@@ -20,6 +20,7 @@ jobs:
     services:
       mysql:
         image: mysql:${{ matrix.mysql-versions }}
+        command: --default-authentication-plugin=mysql_native_password
         env:
           MYSQL_USER: root
           MYSQL_DATABASE: picodb
