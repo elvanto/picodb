@@ -11,7 +11,7 @@ class MysqlDriverTest extends \PHPUnit\Framework\TestCase
 
     public function setUp()
     {
-        $this->driver = new Mysql(array('hostname' => 'localhost', 'username' => 'root', 'password' => '', 'database' => 'picodb'));
+        $this->driver = new Mysql(array('hostname' => 'localhost', 'username' => 'root', 'password' => 'rootpassword', 'database' => 'picodb'));
         $this->driver->getConnection()->exec('CREATE DATABASE IF NOT EXISTS `picodb`');
         $this->driver->getConnection()->exec('DROP TABLE IF EXISTS foobar');
         $this->driver->getConnection()->exec('DROP TABLE IF EXISTS schema_version');

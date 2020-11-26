@@ -22,7 +22,6 @@ jobs:
         image: mysql:${{ matrix.mysql-versions }}
         env:
           MYSQL_USER: root
-          MYSQL_PASSWORD: ''
           MYSQL_DATABASE: picodb
           MYSQL_ROOT_PASSWORD: rootpassword
           MYSQL_HOST: 127.0.0.1
@@ -34,7 +33,7 @@ jobs:
         image: postgres:11
         env:
           POSTGRES_USER: root
-          POSTGRES_PASSWORD: ''
+          POSTGRES_PASSWORD: rootpassword
           POSTGRES_DB: picodb
         ports:
           [ '5432:5432' ]
