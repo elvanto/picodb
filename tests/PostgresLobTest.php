@@ -11,7 +11,7 @@ class PostgresLobTest extends \PHPUnit\Framework\TestCase
 
     public function setUp()
     {
-        $this->db = new Database(array('driver' => 'postgres', 'hostname' => 'localhost', 'username' => 'postgres', 'password' => 'postgres', 'database' => 'picodb'));
+        $this->db = new Database(array('driver' => 'postgres', 'hostname' => '127.0.0.1', 'username' => 'root', 'password' => 'rootpassword', 'database' => 'picodb'));
         $this->db->getConnection()->exec('DROP TABLE IF EXISTS large_objects');
         $this->db->getConnection()->exec('CREATE TABLE large_objects (id VARCHAR(20), file_content bytea)');
     }

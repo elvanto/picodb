@@ -12,7 +12,7 @@ class MysqlSchemaTest extends \PHPUnit\Framework\TestCase
 
     public function setUp()
     {
-        $this->db = new PicoDb\Database(array('driver' => 'mysql', 'hostname' => 'localhost', 'username' => 'root', 'password' => '', 'database' => 'picodb'));
+        $this->db = new PicoDb\Database(array('driver' => 'mysql', 'hostname' => '127.0.0.1', 'username' => 'root', 'password' => 'rootpassword', 'database' => 'picodb'));
         $this->db->getConnection()->exec('DROP TABLE IF EXISTS test1');
         $this->db->getConnection()->exec('DROP TABLE IF EXISTS test2');
         $this->db->getConnection()->exec('DROP TABLE IF EXISTS schema_version');
