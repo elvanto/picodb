@@ -10,7 +10,7 @@ class PostgresSchemaTest extends \PHPUnit\Framework\TestCase
 
     public function setUp()
     {
-        $this->db = new PicoDb\Database(array('driver' => 'postgres', 'hostname' => '127.0.0.1', 'username' => 'postgres', 'password' => 'postgres', 'database' => 'picodb'));
+        $this->db = new PicoDb\Database(array('driver' => 'postgres', 'hostname' => '127.0.0.1', 'username' => 'root', 'password' => 'rootpassword', 'database' => 'picodb'));
         $this->db->getConnection()->exec('DROP TABLE IF EXISTS test1');
         $this->db->getConnection()->exec('DROP TABLE IF EXISTS test2');
         $this->db->getConnection()->exec('DROP TABLE IF EXISTS schema_version');
