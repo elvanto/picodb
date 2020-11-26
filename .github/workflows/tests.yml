@@ -27,7 +27,7 @@ jobs:
           MYSQL_HOST: 127.0.0.1
         ports:
           [ '3306:3306' ]
-        options: --health-cmd "mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries 10
+        options: --health-cmd "mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries 10 --default-authentication-plugin mysql_native_password
 
       postgres:
         image: postgres:11
@@ -74,8 +74,6 @@ jobs:
           sudo apt update
           sudo apt install -y default-mysql-client
           sudo apt install postgresql postgresql-contrib
-          echo "alter user 'root'@'127.0.0.1' identified with mysql_native_password by 'rootpassword'" | mysql -h 127.0.0.1 -u root -prootpassword
-
 
       - name: Run test suite
         run: ./vendor/bin/phpunit
