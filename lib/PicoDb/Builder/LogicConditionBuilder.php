@@ -8,7 +8,7 @@ namespace PicoDb\Builder;
  * @package PicoDb\Builder
  * @author  Frederic Guillot
  */
-class LogicConditionBuilder
+class LogicConditionBuilder implements BuilderInterface
 {
     /**
      * @var string

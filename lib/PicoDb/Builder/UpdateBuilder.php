@@ -8,7 +8,7 @@ namespace PicoDb\Builder;
  * @package PicoDb\Builder
  * @author  Frederic Guillot
  */
-class UpdateBuilder extends BaseBuilder
+class UpdateBuilder extends BaseBuilder implements BuilderInterface
 {
     /**
      * @var string[]

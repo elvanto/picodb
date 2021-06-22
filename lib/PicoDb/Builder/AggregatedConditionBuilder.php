@@ -11,7 +11,7 @@ use PicoDb\Table;
  * @package PicoDb\Builder
  * @author  Frederic Guillot
  */
-class AggregatedConditionBuilder extends ConditionBuilder
+class AggregatedConditionBuilder extends BaseConditionBuilder implements BuilderInterface
 {
     /**
      * Constructor

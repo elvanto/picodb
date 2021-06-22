@@ -8,7 +8,7 @@ namespace PicoDb\Builder;
  * @package PicoDb\Builder
  * @author  Frederic Guillot
  */
-class InsertBuilder extends BaseBuilder
+class InsertBuilder extends BaseBuilder implements BuilderInterface
 {
     /**
      * Build SQL
