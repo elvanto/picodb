@@ -743,7 +743,7 @@ class Table
      * @param bool $having
      * @return $this
      */
-    public function having(bool $having)
+    public function having(bool $having = true)
     {
         $this->having = $having;
         return $this;

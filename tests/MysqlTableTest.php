@@ -43,12 +43,12 @@ class MysqlTableTest extends \PHPUnit\Framework\TestCase
 
     public function testHavingGt()
     {
-        $this->assertEquals('SELECT COUNT(*) as total FROM `test`   GROUP BY `a`  HAVING `total` > ?', $this->db->table('test')->columns('COUNT(*) as total')->groupBy('a')->having(true)->gt('total', '2')->buildSelectQuery());
+        $this->assertEquals('SELECT COUNT(*) as total FROM `test`   GROUP BY `a`  HAVING `total` > ?', $this->db->table('test')->columns('COUNT(*) as total')->groupBy('a')->having()->gt('total', '2')->buildSelectQuery());
     }
 
     public function testHavingAnd()
     {
-        $this->assertEquals('SELECT COUNT(*) as total FROM `test`   GROUP BY `a`  HAVING (`total` > ? AND `total` < ?)', $this->db->table('test')->columns('COUNT(*) as total')->groupBy('a')->having(true)->beginAnd()->gt('total', '2')->lt('total', '10')->closeAnd()->buildSelectQuery());
+        $this->assertEquals('SELECT COUNT(*) as total FROM `test`   GROUP BY `a`  HAVING (`total` > ? AND `total` < ?)', $this->db->table('test')->columns('COUNT(*) as total')->groupBy('a')->having()->beginAnd()->gt('total', '2')->lt('total', '10')->closeAnd()->buildSelectQuery());
     }
 
     public function testOrderBy()
