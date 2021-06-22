@@ -7,6 +7,7 @@ use Closure;
 use PicoDb\Builder\ConditionBuilder;
 use PicoDb\Builder\InsertBuilder;
 use PicoDb\Builder\UpdateBuilder;
+use PicoDb\Builder\AggregatedConditionBuilder;
 
 /**
  * Table
@@ -57,6 +58,14 @@ class Table
      */
     protected $conditionBuilder;
 
+    /**
+     * Aggregated Condition instance
+     *
+     * @access protected
+     * @var    $aggregatedConditionBuilder
+     */
+    protected $aggregatedConditionBuilder;
+    
     /**
      * Database instance
      *
@@ -146,6 +155,14 @@ class Table
     private $groupBy = array();
 
     /**
+     * Having - Use the AggregateConditionBuilder (HAVING) rather than ConditionBuilder (WHERE)
+     *
+     * @access private
+     * @var    bool
+     */
+    private $having = false;
+
+    /**
      * Callback for result filtering
      *
      * @access private
@@ -165,6 +182,7 @@ class Table
         $this->db = $db;
         $this->name = $name;
         $this->conditionBuilder = new ConditionBuilder($db);
+        $this->aggregatedConditionBuilder = new AggregatedConditionBuilder($db);
     }
 
     /**
@@ -187,6 +205,17 @@ class Table
     public function getConditionBuilder()
     {
         return $this->conditionBuilder;
+    }
+
+    /**
+     * Return AggregatedConditionBuilder object
+     *
+     * @access public
+     * @return AggregatedConditionBuilder
+     */
+    public function getAggregatedConditionBuilder()
+    {
+        return $this->aggregatedConditionBuilder;
     }
 
     /**
@@ -695,16 +724,29 @@ class Table
         $this->groupBy = $this->db->escapeIdentifierList($this->groupBy);
 
         return trim(sprintf(
-            'SELECT %s FROM %s %s %s %s %s %s %s',
+            'SELECT %s FROM %s %s %s %s %s %s %s %s',
             $this->sqlSelect,
             $this->db->escapeIdentifier($this->name),
             implode(' ', $this->joins),
             $this->conditionBuilder->build(),
             empty($this->groupBy) ? '' : 'GROUP BY '.implode(', ', $this->groupBy),
+            $this->aggregatedConditionBuilder->build(),
             $this->sqlOrder,
             $this->sqlLimit,
             $this->sqlOffset
         ));
+    }
+
+    /**
+     * Toggles the flag to use AggregateConditionBuilder (HAVING) or ConditionBuilder (WHERE)
+     * 
+     * @param bool $having
+     * @return $this
+     */
+    public function having(bool $having)
+    {
+        $this->having = $having;
+        return $this;
     }
 
     /**
@@ -717,7 +759,11 @@ class Table
      */
     public function __call($name, array $arguments)
     {
-        call_user_func_array(array($this->conditionBuilder, $name), $arguments);
+        if ($this->having) {
+            call_user_func_array(array($this->aggregatedConditionBuilder, $name), $arguments);
+        } else {
+            call_user_func_array(array($this->conditionBuilder, $name), $arguments);
+        }
         return $this;
     }
 
@@ -727,5 +773,6 @@ class Table
      public function __clone()
      {
          $this->conditionBuilder = clone $this->conditionBuilder;
+         $this->aggregatedConditionBuilder = clone $this->aggregatedConditionBuilder;
      }
 }

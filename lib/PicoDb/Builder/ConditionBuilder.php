@@ -19,7 +19,7 @@ class ConditionBuilder
      * @access private
      * @var    Database
      */
-    private $db;
+    protected $db;
 
     /**
      * Condition values
@@ -27,7 +27,7 @@ class ConditionBuilder
      * @access private
      * @var    array
      */
-    private $values = array();
+    protected $values = array();
 
     /**
      * SQL AND conditions
@@ -35,7 +35,7 @@ class ConditionBuilder
      * @access private
      * @var    string[]
      */
-    private $conditions = array();
+    protected $conditions = array();
 
     /**
      * SQL embedded AND/OR conditions
@@ -43,7 +43,7 @@ class ConditionBuilder
      * @access private
      * @var    LogicConditionBuilder[]
      */
-    private $embeddedConditions = array();
+    protected $embeddedConditions = array();
 
     /**
      * SQL condition offset
@@ -51,7 +51,7 @@ class ConditionBuilder
      * @access private
      * @var int
      */
-    private $embeddedConditionOffset = 0;
+    protected $embeddedConditionOffset = 0;
 
     /**
      * Constructor
