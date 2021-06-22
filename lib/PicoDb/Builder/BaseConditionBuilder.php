@@ -6,7 +6,7 @@ use PicoDb\Database;
 use PicoDb\Table;
 
 /**
- * Handle SQL conditions
+ * Class BaseConditionBuilder
  *
  * @package PicoDb\Builder
  * @author  Frederic Guillot

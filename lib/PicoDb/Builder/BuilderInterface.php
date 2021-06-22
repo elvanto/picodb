@@ -2,6 +2,12 @@
 
 namespace PicoDb\Builder;
 
+/**
+ * Class BuilderInterface
+ *
+ * @package PicoDb\Builder
+ * @author  Frederic Guillot
+ */
 interface BuilderInterface
 {
     /**

@@ -3,7 +3,7 @@
 namespace PicoDb\Builder;
 
 /**
- * Class OrConditionBuilder
+ * Class LogicConditionBuilder
  *
  * @package PicoDb\Builder
  * @author  Frederic Guillot
