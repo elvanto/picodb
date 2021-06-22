@@ -3,12 +3,12 @@
 namespace PicoDb\Builder;
 
 /**
- * Class OrConditionBuilder
+ * Class LogicConditionBuilder
  *
  * @package PicoDb\Builder
  * @author  Frederic Guillot
  */
-class LogicConditionBuilder
+class LogicConditionBuilder implements BuilderInterface
 {
     /**
      * @var string

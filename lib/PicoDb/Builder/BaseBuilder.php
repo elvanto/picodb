@@ -5,7 +5,7 @@ namespace PicoDb\Builder;
 use PicoDb\Database;
 
 /**
- * Class InsertBuilder
+ * Class BaseBuilder
  *
  * @package PicoDb\Builder
  * @author  Frederic Guillot

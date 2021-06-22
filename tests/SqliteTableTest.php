@@ -35,40 +35,50 @@ class SqliteTableTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('SELECT * FROM "test"   GROUP BY "a"', $this->db->table('test')->groupBy('a')->buildSelectQuery());
     }
 
+    public function testHavingGt()
+    {
+        $this->assertEquals('SELECT COUNT(*) as total FROM "test"   GROUP BY "a"  HAVING "total" > ?', $this->db->table('test')->columns('COUNT(*) as total')->groupBy('a')->having()->gt('total', '2')->buildSelectQuery());
+    }
+
+    public function testHavingAnd()
+    {
+        $this->assertEquals('SELECT COUNT(*) as total FROM "test"   GROUP BY "a"  HAVING ("total" > ? AND "total" < ?)', $this->db->table('test')->columns('COUNT(*) as total')->groupBy('a')->having()->beginAnd()->gt('total', '2')->lt('total', '10')->closeAnd()->buildSelectQuery());
+    }
+
     public function testOrderBy()
     {
-        $this->assertEquals('SELECT * FROM "test"     ORDER BY "a" ASC', $this->db->table('test')->asc('a')->buildSelectQuery());
-        $this->assertEquals('SELECT * FROM "test"     ORDER BY "a" ASC', $this->db->table('test')->orderBy('a', Table::SORT_ASC)->buildSelectQuery());
+        $this->assertEquals('SELECT * FROM "test"      ORDER BY "a" ASC', $this->db->table('test')->asc('a')->buildSelectQuery());
+        $this->assertEquals('SELECT * FROM "test"      ORDER BY "a" ASC', $this->db->table('test')->orderBy('a', Table::SORT_ASC)->buildSelectQuery());
 
-        $this->assertEquals('SELECT * FROM "test"     ORDER BY "a" DESC', $this->db->table('test')->desc('a')->buildSelectQuery());
-        $this->assertEquals('SELECT * FROM "test"     ORDER BY "a" DESC', $this->db->table('test')->orderBy('a', Table::SORT_DESC)->buildSelectQuery());
+        $this->assertEquals('SELECT * FROM "test"      ORDER BY "a" DESC', $this->db->table('test')->desc('a')->buildSelectQuery());
+        $this->assertEquals('SELECT * FROM "test"      ORDER BY "a" DESC', $this->db->table('test')->orderBy('a', Table::SORT_DESC)->buildSelectQuery());
 
-        $this->assertEquals('SELECT * FROM "test"     ORDER BY "a" ASC, "b" ASC', $this->db->table('test')->asc('a')->asc('b')->buildSelectQuery());
-        $this->assertEquals('SELECT * FROM "test"     ORDER BY "a" DESC, "b" DESC', $this->db->table('test')->desc('a')->desc('b')->buildSelectQuery());
+        $this->assertEquals('SELECT * FROM "test"      ORDER BY "a" ASC, "b" ASC', $this->db->table('test')->asc('a')->asc('b')->buildSelectQuery());
+        $this->assertEquals('SELECT * FROM "test"      ORDER BY "a" DESC, "b" DESC', $this->db->table('test')->desc('a')->desc('b')->buildSelectQuery());
 
-        $this->assertEquals('SELECT * FROM "test"     ORDER BY "a" ASC, "b" ASC', $this->db->table('test')->orderBy('a')->orderBy('b')->buildSelectQuery());
-        $this->assertEquals('SELECT * FROM "test"     ORDER BY "a" DESC, "b" DESC', $this->db->table('test')->orderBy('a', Table::SORT_DESC)->orderBy('b', Table::SORT_DESC)->buildSelectQuery());
+        $this->assertEquals('SELECT * FROM "test"      ORDER BY "a" ASC, "b" ASC', $this->db->table('test')->orderBy('a')->orderBy('b')->buildSelectQuery());
+        $this->assertEquals('SELECT * FROM "test"      ORDER BY "a" DESC, "b" DESC', $this->db->table('test')->orderBy('a', Table::SORT_DESC)->orderBy('b', Table::SORT_DESC)->buildSelectQuery());
 
-        $this->assertEquals('SELECT * FROM "test"     ORDER BY "a" DESC, "b" ASC', $this->db->table('test')->desc('a')->asc('b')->buildSelectQuery());
+        $this->assertEquals('SELECT * FROM "test"      ORDER BY "a" DESC, "b" ASC', $this->db->table('test')->desc('a')->asc('b')->buildSelectQuery());
     }
 
     public function testLimit()
     {
-        $this->assertEquals('SELECT * FROM "test"      LIMIT 10', $this->db->table('test')->limit(10)->buildSelectQuery());
+        $this->assertEquals('SELECT * FROM "test"       LIMIT 10', $this->db->table('test')->limit(10)->buildSelectQuery());
         $this->assertEquals('SELECT * FROM "test"', $this->db->table('test')->limit(null)->buildSelectQuery());
     }
 
     public function testOffset()
     {
-        $this->assertEquals('SELECT * FROM "test"       OFFSET 0', $this->db->table('test')->offset(0)->buildSelectQuery());
-        $this->assertEquals('SELECT * FROM "test"       OFFSET 10', $this->db->table('test')->offset(10)->buildSelectQuery());
+        $this->assertEquals('SELECT * FROM "test"        OFFSET 0', $this->db->table('test')->offset(0)->buildSelectQuery());
+        $this->assertEquals('SELECT * FROM "test"        OFFSET 10', $this->db->table('test')->offset(10)->buildSelectQuery());
         $this->assertEquals('SELECT * FROM "test"', $this->db->table('test')->limit(null)->buildSelectQuery());
     }
 
     public function testLimitOffset()
     {
-        $this->assertEquals('SELECT * FROM "test"      LIMIT 2  OFFSET 0', $this->db->table('test')->offset(0)->limit(2)->buildSelectQuery());
-        $this->assertEquals('SELECT * FROM "test"      LIMIT 5  OFFSET 10', $this->db->table('test')->offset(10)->limit(5)->buildSelectQuery());
+        $this->assertEquals('SELECT * FROM "test"       LIMIT 2  OFFSET 0', $this->db->table('test')->offset(0)->limit(2)->buildSelectQuery());
+        $this->assertEquals('SELECT * FROM "test"       LIMIT 5  OFFSET 10', $this->db->table('test')->offset(10)->limit(5)->buildSelectQuery());
     }
 
     public function testSubquery()
