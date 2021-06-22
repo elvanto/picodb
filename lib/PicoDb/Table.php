@@ -310,7 +310,7 @@ class Table
      */
     public function findAll()
     {
-        $rq = $this->db->execute($this->buildSelectQuery(), $this->conditionBuilder->getValues());
+        $rq = $this->db->execute($this->buildSelectQuery(), array_merge($this->conditionBuilder->getValues(), $this->aggregatedConditionBuilder->getValues()));
         $results = $rq->fetchAll(PDO::FETCH_ASSOC);
 
         if (is_callable($this->callback) && ! empty($results)) {
@@ -330,7 +330,7 @@ class Table
     public function findAllByColumn($column)
     {
         $this->columns = array($column);
-        $rq = $this->db->execute($this->buildSelectQuery(), $this->conditionBuilder->getValues());
+        $rq = $this->db->execute($this->buildSelectQuery(), array_merge($this->conditionBuilder->getValues(), $this->aggregatedConditionBuilder->getValues()));
 
         return $rq->fetchAll(PDO::FETCH_COLUMN, 0);
     }
@@ -361,7 +361,7 @@ class Table
         $this->limit(1);
         $this->columns = array($column);
 
-        return $this->db->execute($this->buildSelectQuery(), $this->conditionBuilder->getValues())->fetchColumn();
+        return $this->db->execute($this->buildSelectQuery(), array_merge($this->conditionBuilder->getValues(), $this->aggregatedConditionBuilder->getValues()))->fetchColumn();
     }
 
     /**
