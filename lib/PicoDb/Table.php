@@ -4,10 +4,10 @@ namespace PicoDb;
 
 use PDO;
 use Closure;
+use PicoDb\Builder\AggregatedConditionBuilder;
 use PicoDb\Builder\ConditionBuilder;
 use PicoDb\Builder\InsertBuilder;
 use PicoDb\Builder\UpdateBuilder;
-use PicoDb\Builder\AggregatedConditionBuilder;
 
 /**
  * Table
@@ -65,7 +65,7 @@ class Table
      * @var    $aggregatedConditionBuilder
      */
     protected $aggregatedConditionBuilder;
-    
+
     /**
      * Database instance
      *
@@ -155,12 +155,12 @@ class Table
     private $groupBy = array();
 
     /**
-     * Having - Use the AggregateConditionBuilder (HAVING) rather than ConditionBuilder (WHERE)
+     * Flag to use the AggregateConditionBuilder (HAVING) or ConditionBuilder (WHERE)
      *
      * @access private
-     * @var    bool
+     * @var    string
      */
-    private $having = false;
+    private $conditionalBuilder = 'WHERE';
 
     /**
      * Callback for result filtering
@@ -738,14 +738,24 @@ class Table
     }
 
     /**
-     * Toggles the flag to use AggregateConditionBuilder (HAVING) or ConditionBuilder (WHERE)
+     * Sets the conditionalBuilder flag to use AggregateConditionBuilder (HAVING)
      * 
-     * @param bool $having
      * @return $this
      */
-    public function having(bool $having = true)
+    public function having()
     {
-        $this->having = $having;
+        $this->conditionalBuilder = 'HAVING';
+        return $this;
+    }
+
+    /**
+     * Sets the conditionalBuilder flag to use ConditionBuilder (WHERE)
+     *
+     * @return $this
+     */
+    public function where()
+    {
+        $this->conditionalBuilder = 'WHERE';
         return $this;
     }
 
@@ -759,7 +769,7 @@ class Table
      */
     public function __call($name, array $arguments)
     {
-        if ($this->having) {
+        if ($this->conditionalBuilder === 'HAVING') {
             call_user_func_array(array($this->aggregatedConditionBuilder, $name), $arguments);
         } else {
             call_user_func_array(array($this->conditionBuilder, $name), $arguments);
