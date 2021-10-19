@@ -6,12 +6,12 @@ use PicoDb\Database;
 use PicoDb\Table;
 
 /**
- * Class ConditionBuilder
+ * Class AggregatedConditionBuilder
  *
  * @package PicoDb\Builder
  * @author  Frederic Guillot
  */
-class ConditionBuilder extends BaseConditionBuilder implements BuilderInterface
+class AggregatedConditionBuilder extends BaseConditionBuilder implements BuilderInterface
 {
     /**
      * Constructor
@@ -25,13 +25,13 @@ class ConditionBuilder extends BaseConditionBuilder implements BuilderInterface
     }
 
     /**
-     * Build the SQL condition
+     * Build the SQL aggregated condition
      *
      * @access public
      * @return string
      */
     public function build()
     {
-        return empty($this->conditions) ? '' : ' WHERE '.implode(' AND ', $this->conditions);
+        return empty($this->conditions) ? '' : ' HAVING '.implode(' AND ', $this->conditions);
     }
 }

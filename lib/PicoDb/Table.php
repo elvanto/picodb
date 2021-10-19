@@ -4,6 +4,7 @@ namespace PicoDb;
 
 use PDO;
 use Closure;
+use PicoDb\Builder\AggregatedConditionBuilder;
 use PicoDb\Builder\ConditionBuilder;
 use PicoDb\Builder\InsertBuilder;
 use PicoDb\Builder\UpdateBuilder;
@@ -56,6 +57,14 @@ class Table
      * @var    ConditionBuilder
      */
     protected $conditionBuilder;
+
+    /**
+     * Aggregated Condition instance
+     *
+     * @access protected
+     * @var    $aggregatedConditionBuilder
+     */
+    protected $aggregatedConditionBuilder;
 
     /**
      * Database instance
@@ -146,6 +155,14 @@ class Table
     private $groupBy = array();
 
     /**
+     * Flag to use the AggregateConditionBuilder (HAVING) or ConditionBuilder (WHERE)
+     *
+     * @access private
+     * @var    string
+     */
+    private $conditionalBuilder = 'WHERE';
+
+    /**
      * Callback for result filtering
      *
      * @access private
@@ -165,6 +182,7 @@ class Table
         $this->db = $db;
         $this->name = $name;
         $this->conditionBuilder = new ConditionBuilder($db);
+        $this->aggregatedConditionBuilder = new AggregatedConditionBuilder($db);
     }
 
     /**
@@ -187,6 +205,17 @@ class Table
     public function getConditionBuilder()
     {
         return $this->conditionBuilder;
+    }
+
+    /**
+     * Return AggregatedConditionBuilder object
+     *
+     * @access public
+     * @return AggregatedConditionBuilder
+     */
+    public function getAggregatedConditionBuilder()
+    {
+        return $this->aggregatedConditionBuilder;
     }
 
     /**
@@ -281,7 +310,7 @@ class Table
      */
     public function findAll()
     {
-        $rq = $this->db->execute($this->buildSelectQuery(), $this->conditionBuilder->getValues());
+        $rq = $this->db->execute($this->buildSelectQuery(), array_merge($this->conditionBuilder->getValues(), $this->aggregatedConditionBuilder->getValues()));
         $results = $rq->fetchAll(PDO::FETCH_ASSOC);
 
         if (is_callable($this->callback) && ! empty($results)) {
@@ -301,7 +330,7 @@ class Table
     public function findAllByColumn($column)
     {
         $this->columns = array($column);
-        $rq = $this->db->execute($this->buildSelectQuery(), $this->conditionBuilder->getValues());
+        $rq = $this->db->execute($this->buildSelectQuery(), array_merge($this->conditionBuilder->getValues(), $this->aggregatedConditionBuilder->getValues()));
 
         return $rq->fetchAll(PDO::FETCH_COLUMN, 0);
     }
@@ -332,7 +361,7 @@ class Table
         $this->limit(1);
         $this->columns = array($column);
 
-        return $this->db->execute($this->buildSelectQuery(), $this->conditionBuilder->getValues())->fetchColumn();
+        return $this->db->execute($this->buildSelectQuery(), array_merge($this->conditionBuilder->getValues(), $this->aggregatedConditionBuilder->getValues()))->fetchColumn();
     }
 
     /**
@@ -695,16 +724,39 @@ class Table
         $this->groupBy = $this->db->escapeIdentifierList($this->groupBy);
 
         return trim(sprintf(
-            'SELECT %s FROM %s %s %s %s %s %s %s',
+            'SELECT %s FROM %s %s %s %s %s %s %s %s',
             $this->sqlSelect,
             $this->db->escapeIdentifier($this->name),
             implode(' ', $this->joins),
             $this->conditionBuilder->build(),
             empty($this->groupBy) ? '' : 'GROUP BY '.implode(', ', $this->groupBy),
+            $this->aggregatedConditionBuilder->build(),
             $this->sqlOrder,
             $this->sqlLimit,
             $this->sqlOffset
         ));
+    }
+
+    /**
+     * Sets the conditionalBuilder flag to use AggregateConditionBuilder (HAVING)
+     * 
+     * @return $this
+     */
+    public function having()
+    {
+        $this->conditionalBuilder = 'HAVING';
+        return $this;
+    }
+
+    /**
+     * Sets the conditionalBuilder flag to use ConditionBuilder (WHERE)
+     *
+     * @return $this
+     */
+    public function where()
+    {
+        $this->conditionalBuilder = 'WHERE';
+        return $this;
     }
 
     /**
@@ -717,7 +769,11 @@ class Table
      */
     public function __call($name, array $arguments)
     {
-        call_user_func_array(array($this->conditionBuilder, $name), $arguments);
+        if ($this->conditionalBuilder === 'HAVING') {
+            call_user_func_array(array($this->aggregatedConditionBuilder, $name), $arguments);
+        } else {
+            call_user_func_array(array($this->conditionBuilder, $name), $arguments);
+        }
         return $this;
     }
 
@@ -727,5 +783,6 @@ class Table
      public function __clone()
      {
          $this->conditionBuilder = clone $this->conditionBuilder;
+         $this->aggregatedConditionBuilder = clone $this->aggregatedConditionBuilder;
      }
 }
