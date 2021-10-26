@@ -193,9 +193,11 @@ class BaseConditionBuilder
      */
     public function in($column, array $values)
     {
-        if (! empty($values)) {
+        if (!empty($values)) {
             $this->addCondition($this->db->escapeIdentifier($column).' IN ('.implode(', ', array_fill(0, count($values), '?')).')');
             $this->values = array_merge($this->values, $values);
+        } else {
+            throw new \InvalidArgumentException('$values must not be an empty array');
         }
     }
 
