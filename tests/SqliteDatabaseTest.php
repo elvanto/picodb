@@ -48,12 +48,12 @@ class SqliteDatabaseTest extends \PHPUnit\Framework\TestCase
 
     public function testDuplicateKey()
     {
+        $this->expectException(\PicoDb\SQLException::class);
+
         $this->db->getConnection()->exec('CREATE TABLE foobar (something TEXT UNIQUE)');
 
         $this->assertNotFalse($this->db->execute('INSERT INTO foobar (something) VALUES (?)', array('a')));
-        $this->assertFalse($this->db->execute('INSERT INTO foobar (something) VALUES (?)', array('a')));
-
-        $this->assertEquals(1, $this->db->execute('SELECT COUNT(*) FROM foobar WHERE something=?', array('a'))->fetchColumn());
+        $this->db->execute('INSERT INTO foobar (something) VALUES (?)', array('a'));
     }
 
     public function testThatTransactionReturnsAValue()
@@ -86,12 +86,14 @@ class SqliteDatabaseTest extends \PHPUnit\Framework\TestCase
 
     public function testThatTransactionReturnsFalseWhithDuplicateKey()
     {
-        $this->assertFalse($this->db->transaction(function (Database $db) {
+        $this->expectException(\PicoDb\SQLException::class);
+
+        $this->db->transaction(function (Database $db) {
             $db->getConnection()->exec('CREATE TABLE foobar (something TEXT UNIQUE)');
             $r1 = $db->execute('INSERT INTO foobar (something) VALUES (?)', array('a'));
             $r2 = $db->execute('INSERT INTO foobar (something) VALUES (?)', array('a'));
             return $r1 && $r2;
-        }));
+        });
     }
 
     public function testGetInstance()
