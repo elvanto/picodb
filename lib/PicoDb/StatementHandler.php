@@ -344,10 +344,6 @@ class StatementHandler
         $this->db->cancelTransaction();
         $this->db->setLogMessage($e->getMessage());
 
-        if ($this->db->getDriver()->isDuplicateKeyError($e->getCode())) {
-            return false;
-        }
-
         throw new SQLException('SQL Error: '.$e->getMessage());
     }
 }
