@@ -263,7 +263,7 @@ class SqliteTableTest extends \PHPUnit\Framework\TestCase
 
     public function testCount()
     {
-        $this->assertNotFalse($this->db->execute('CREATE TABLE foobar (a INTEGER)'));
+        $this->assertNotFalse($this->db->execute('CREATE TABLE foobar (a INTEGER, b INTEGER )'));
         $this->assertTrue($this->db->table('foobar')->insert(array('a' => 2, 'b' => 3)));
         $this->assertTrue($this->db->table('foobar')->insert(array('a' => 5, 'b' => 1)));
         $this->assertTrue($this->db->table('foobar')->insert(array('a' => 6, 'b' => 2)));
