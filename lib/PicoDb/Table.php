@@ -401,12 +401,20 @@ class Table
      * Count
      *
      * @access public
+     * @param string $column
+     * @param bool $distinct
      * @return integer
      */
-    public function count()
+    public function count(string $column = '*', bool $distinct = false)
     {
+        $column = $this->db->escapeIdentifier($column);
+
+        if ($distinct) {
+            $column = 'DISTINCT ' . $column;
+        }
+
         $sql = sprintf(
-            'SELECT COUNT(*) FROM %s '.implode(' ', $this->joins).$this->conditionBuilder->build().$this->sqlOrder.$this->sqlLimit.$this->sqlOffset,
+            'SELECT COUNT(' . $column . ') FROM %s '.implode(' ', $this->joins).$this->conditionBuilder->build().$this->sqlOrder.$this->sqlLimit.$this->sqlOffset,
             $this->db->escapeIdentifier($this->name)
         );
 
@@ -420,10 +428,10 @@ class Table
      * Sum
      *
      * @access public
-     * @param  string   $column
+     * @param string $column
      * @return float
      */
-    public function sum($column)
+    public function sum(string $column)
     {
         $sql = sprintf(
             'SELECT SUM(%s) FROM %s '.implode(' ', $this->joins).$this->conditionBuilder->build().$this->sqlOrder.$this->sqlLimit.$this->sqlOffset,
