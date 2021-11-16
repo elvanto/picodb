@@ -407,7 +407,9 @@ class Table
      */
     public function count(string $column = '*', bool $distinct = false)
     {
-        $column = $this->db->escapeIdentifier($column);
+        if ($column != '*') {
+            $column = $this->db->escapeIdentifier($column);
+        }
 
         if ($distinct) {
             $column = 'DISTINCT ' . $column;
