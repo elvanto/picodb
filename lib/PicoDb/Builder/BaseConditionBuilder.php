@@ -79,7 +79,7 @@ class BaseConditionBuilder
      * Adds condition values
      *
      * @access public
-     * @param  array
+     * @param  array $values
      */
     public function addValues($values)
     {
