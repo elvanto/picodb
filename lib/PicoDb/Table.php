@@ -784,6 +784,9 @@ class Table
         } else {
             call_user_func_array(array($this->conditionBuilder, $name), $arguments);
         }
+        if (count($arguments) == 2 && end($arguments) instanceof Table) {
+            $this->addSubqueryValues(end($arguments));
+        }
         return $this;
     }
 
@@ -794,5 +797,20 @@ class Table
      {
          $this->conditionBuilder = clone $this->conditionBuilder;
          $this->aggregatedConditionBuilder = clone $this->aggregatedConditionBuilder;
+     }
+
+     /**
+      * Adds values to builder when subquery is added to the other
+      *
+      * @access private
+      * @param  Table $subquery
+      */
+     private function addSubqueryValues(Table $subquery)
+     {
+         if ($this->conditionalBuilder === 'HAVING') {
+             $this->conditionBuilder->addValues($subquery->getConditionBuilder()->getValues());
+         } else {
+             $this->aggregatedConditionBuilder->addValues($subquery->getAggregatedConditionBuilder()->getValues());
+         }
      }
 }

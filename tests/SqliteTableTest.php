@@ -304,6 +304,17 @@ class SqliteTableTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(array(2, 5), $table->getConditionBuilder()->getValues());
     }
 
+    public function testHavingSubquery()
+    {
+        $table = $this->db->table('test')->notNull('a')->beginOr()->eq('b', 2)->gte('c', 5)->closeOr();
+        $subquery = $this->db->table('test')->columns('a')->groupBy('a')->having()->gte('SUM( d )', 10);
+        $table->inSubquery('a', $subquery);
+
+        $this->assertEquals('SELECT * FROM "test"   WHERE "a" IS NOT NULL AND ("b" = ? OR "c" >= ?) AND "a" IN (SELECT "a" FROM "test"   GROUP BY "a"  HAVING SUM( d ) >= ?)', $table->buildSelectQuery());
+        $this->assertEquals(array(2, 5), $table->getConditionBuilder()->getValues());
+        $this->assertEquals(array(10), $table->getAggregatedConditionBuilder()->getValues());
+    }
+
     public function testMultipleOrConditions()
     {
         $table = $this->db->table('test');

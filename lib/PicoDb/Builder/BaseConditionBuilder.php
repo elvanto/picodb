@@ -76,6 +76,17 @@ class BaseConditionBuilder
     }
 
     /**
+     * Adds condition values
+     *
+     * @access public
+     * @param  array $values
+     */
+    public function addValues($values)
+    {
+        $this->values = array_merge($this->values, $values);
+    }
+
+    /**
      * Returns true if there is some conditions
      *
      * @access public
