@@ -417,7 +417,7 @@ class Table
     public function count(string $column = '*')
     {
         if ($column != '*') {
-            $column = ($this->distinct() ? 'DISTINCT ' : '') . $this->db->escapeIdentifier($column);
+            $column = ($this->distinct ? 'DISTINCT ' : '') . $this->db->escapeIdentifier($column);
         }
 
 
@@ -450,6 +450,7 @@ class Table
     {
         $sql = sprintf(
             'SELECT SUM(%s) FROM %s %s %s %s %s %s %s %s',
+            $column,
             $this->db->escapeIdentifier($this->name),
             implode(' ', $this->joins),
             $this->conditionBuilder->build(),
@@ -461,6 +462,7 @@ class Table
         );
 
         $rq = $this->db->execute($sql, array_merge($this->conditionBuilder->getValues(), $this->aggregatedConditionBuilder->getValues()));
+        $result = $rq->fetchColumn();
 
         return $result ? (float) $result : 0;
     }
