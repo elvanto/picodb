@@ -66,21 +66,21 @@ class SqliteTableTest extends \PHPUnit\Framework\TestCase
     {
         $query = $this->db->table('test')->like('a', 'test');
         $this->assertEquals('SELECT * FROM "test"   WHERE "a" LIKE ?', $query->buildSelectQuery());
-        $this->assertEquals('a', $query->getConditionBuilder()->getValues()[0]);
+        $this->assertEquals('test', $query->getConditionBuilder()->getValues()[0]);
     }
 
     public function testIlike()
     {
         $query = $this->db->table('test')->like('a', 'test');
         $this->assertEquals('SELECT * FROM "test"   WHERE "a" LIKE ?', $query->buildSelectQuery());
-        $this->assertEquals('a', $query->getConditionBuilder()->getValues()[0]);
+        $this->assertEquals('test', $query->getConditionBuilder()->getValues()[0]);
     }
 
     public function testNotLike()
     {
         $query = $this->db->table('test')->like('a', 'test');
         $this->assertEquals('SELECT * FROM "test"   WHERE "a" NOT LIKE ?', $query->buildSelectQuery());
-        $this->assertEquals('a', $query->getConditionBuilder()->getValues()[0]);
+        $this->assertEquals('test', $query->getConditionBuilder()->getValues()[0]);
     }
 
     public function testLimit()
