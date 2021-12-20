@@ -280,6 +280,18 @@ class BaseConditionBuilder
     }
 
     /**
+     * NOT LIKE condition
+     *
+     * @param $column
+     * @param $value
+     */
+    public function notLike($column, $value)
+    {
+        $this->addCondition($this->db->escapeIdentifier($column).' NOT LIKE ?');
+        $this->values[] = $value;
+    }
+
+    /**
      * Greater than condition
      *
      * @access public

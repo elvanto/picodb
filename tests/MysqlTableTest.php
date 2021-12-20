@@ -68,6 +68,27 @@ class MysqlTableTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('SELECT * FROM `test`      ORDER BY `a` DESC, `b` ASC', $this->db->table('test')->desc('a')->asc('b')->buildSelectQuery());
     }
 
+    public function testLike()
+    {
+        $query = $this->db->table('test')->like('a', 'test');
+        $this->assertEquals('SELECT * FROM `test` WHERE `a` LIKE BINARY ?', $query->buildSelectQuery());
+        $this->assertEquals('a', $query->getConditionBuilder()->getValues()[0]);
+    }
+
+    public function testIlike()
+    {
+        $query = $this->db->table('test')->like('a', 'test');
+        $this->assertEquals('SELECT * FROM `test` WHERE `a` LIKE ?', $query->buildSelectQuery());
+        $this->assertEquals('a', $query->getConditionBuilder()->getValues()[0]);
+    }
+
+    public function testNotLike()
+    {
+        $query = $this->db->table('test')->like('a', 'test');
+        $this->assertEquals('SELECT * FROM `test` WHERE `a` NOT LIKE ?', $query->buildSelectQuery());
+        $this->assertEquals('a', $query->getConditionBuilder()->getValues()[0]);
+    }
+
     public function testLimit()
     {
         $this->assertEquals('SELECT * FROM `test`       LIMIT 10', $this->db->table('test')->limit(10)->buildSelectQuery());

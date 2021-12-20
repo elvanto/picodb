@@ -28,6 +28,7 @@ use PicoDb\Builder\UpdateBuilder;
  * @method   $this   notInSubquery($column, Table $subquery)
  * @method   $this   like($column, $value)
  * @method   $this   ilike($column, $value)
+ * @method   $this   notLike($column, $value)
  * @method   $this   gt($column, $value)
  * @method   $this   gtSubquery($column, Table $subquery)
  * @method   $this   lt($column, $value)
