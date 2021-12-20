@@ -561,6 +561,60 @@ class Table
     }
 
     /**
+     * Join your table onto a subquery.
+     *
+     * @param Table $subQuery
+     * @param string $alias
+     * @param string $foreign_column
+     * @param string $local_column
+     * @param string $local_table
+     * @return Table
+     */
+    public function joinSubquery(Table $subQuery, string $alias, string $foreign_column, string $local_column, string $local_table = ''): Table
+    {
+        $this->joins[] = sprintf(
+            'LEFT JOIN (%s) AS %s ON %s=%s',
+            $subQuery->buildSelectQuery(),
+            $this->db->escapeIdentifier($alias),
+            $this->db->escapeIdentifier($alias).'.'.$this->db->escapeIdentifier($foreign_column),
+            $this->db->escapeIdentifier($local_table ?: $this->name).'.'.$this->db->escapeIdentifier($local_column)
+        );
+
+        $this->getConditionBuilder()->addValues(array_merge($subQuery->getConditionBuilder()->getValues(), $subQuery->getAggregatedConditionBuilder()->getValues()));
+
+        return $this;
+    }
+
+    /**
+     * Inner Join your table onto a subquery.
+     *
+     * @param Table $subQuery
+     * @param string $alias
+     * @param string $foreign_column
+     * @param string $local_column
+     * @param string $local_table
+     * @return Table
+     */
+    public function innerJoinSubquery(Table $subQuery, string $alias, string $foreign_column, string $local_column, string $local_table = ''): Table
+    {
+        $joinSql = str_replace(
+            '?',
+            array_merge($subQuery->getConditionBuilder()->getValues(), $this->getAggregatedConditionBuilder()->getValues()),
+            $subQuery->buildSelectQuery()
+        );
+
+        $this->joins[] = sprintf(
+            'INNER JOIN (%s) AS %s ON %s=%s',
+            $joinSql,
+            $this->db->escapeIdentifier($alias),
+            $this->db->escapeIdentifier($alias).'.'.$this->db->escapeIdentifier($foreign_column),
+            $this->db->escapeIdentifier($local_table ?: $this->name).'.'.$this->db->escapeIdentifier($local_column)
+        );
+
+        return $this;
+    }
+
+    /**
      * Order by
      *
      * @access public
