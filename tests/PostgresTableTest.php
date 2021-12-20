@@ -83,7 +83,7 @@ class PostgresTableTest extends \PHPUnit\Framework\TestCase
 
     public function testNotLike()
     {
-        $query = $this->db->table('test')->like('a', 'test');
+        $query = $this->db->table('test')->notLike('a', 'test');
         $this->assertEquals('SELECT * FROM "test"   WHERE "a" NOT LIKE ?', $query->buildSelectQuery());
         $this->assertEquals('test', $query->getConditionBuilder()->getValues()[0]);
     }
