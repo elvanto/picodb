@@ -221,9 +221,8 @@ class MysqlTableTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->db->table('foobar')->insert(array('a' => 2, 'b' => 3)));
         $this->assertTrue($this->db->table('foobar')->insert(array('a' => 5, 'b' => 1)));
         $this->assertTrue($this->db->table('foobar')->insert(array('a' => 6, 'b' => 2)));
-        $this->assertTrue($this->db->table('foobar')->insert(array('a' => 5, 'b' => 3)));
+        $this->assertTrue($this->db->table('foobar')->insert(array('a' => null, 'b' => 3)));
         $this->assertTrue($this->db->table('foobar')->insert(array('a' => 2, 'b' => 4)));
-
         $query = $this->db->table('foobar');
         $this->assertEquals(5, $query->count());
         $this->assertEquals(5, $query->count('a'));
