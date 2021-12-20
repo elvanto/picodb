@@ -262,7 +262,7 @@ class MysqlTableTest extends \PHPUnit\Framework\TestCase
 
         $query = $this->db->table('foobar');
         $this->assertEquals(5, $query->count());
-        $this->assertEquals(5, $query->count('a'));
+        $this->assertEquals(4, $query->count('a'));
         $this->assertEquals(5, $query->count('b'));
 
         $query->eq('b', 3);
