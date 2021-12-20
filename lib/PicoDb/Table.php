@@ -37,6 +37,8 @@ use PicoDb\Builder\UpdateBuilder;
  * @method   $this   gteSubquery($column, Table $subquery)
  * @method   $this   lte($column, $value)
  * @method   $this   lteSubquery($column, Table $subquery)
+ * @method   $this   between($column, $lowValue, $highValue)
+ * @method   $this   notBetween($column, $lowValue, $highValue)
  * @method   $this   isNull($column)
  * @method   $this   notNull($column)
  */

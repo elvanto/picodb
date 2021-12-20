@@ -227,6 +227,20 @@ class PostgresTableTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(array(5), $table->getConditionBuilder()->getValues());
     }
 
+    public function testBetween()
+    {
+        $query = $this->db->table('test')->between('a', 1, 5);
+        $this->assertEquals('SELECT * FROM "test"   WHERE "a" BETWEEN ? AND ?');
+        $this->assertEquals([1,5], $query->getConditionBuilder()->getValues());
+    }
+
+    public function testNotBetween()
+    {
+        $query = $this->db->table('test')->notBetween('a', 1, 5);
+        $this->assertEquals('SELECT * FROM "test"   WHERE "a" NOT BETWEEN ? AND ?');
+        $this->assertEquals([1,5], $query->getConditionBuilder()->getValues());
+    }
+
     public function testConditionIsNull()
     {
         $table = $this->db->table('test');

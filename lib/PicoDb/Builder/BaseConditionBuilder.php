@@ -396,6 +396,34 @@ class BaseConditionBuilder
     }
 
     /**
+     * BETWEEN operator
+     *
+     * @param $column
+     * @param $lowValue
+     * @param $highValue
+     */
+    public function between($column, $lowValue, $highValue)
+    {
+        $this->addCondition($this->db->escapeIdentifier($column).' BETWEEN ? AND ?');
+        $this->values[] = $lowValue;
+        $this->values[] = $highValue;
+    }
+
+    /**
+     * NOT BETWEEN operator
+     *
+     * @param $column
+     * @param $lowValue
+     * @param $highValue
+     */
+    public function notBetween($column, $lowValue, $highValue)
+    {
+        $this->addCondition($this->db->escapeIdentifier($column).' NOT BETWEEN ? AND ?');
+        $this->values[] = $lowValue;
+        $this->values[] = $highValue;
+    }
+
+    /**
      * IS NULL condition
      *
      * @access public
