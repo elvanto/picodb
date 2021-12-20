@@ -223,16 +223,23 @@ class MysqlTableTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->db->table('foobar')->insert(array('a' => 6, 'b' => 2)));
         $this->assertTrue($this->db->table('foobar')->insert(array('a' => 5, 'b' => 3)));
         $this->assertTrue($this->db->table('foobar')->insert(array('a' => 2, 'b' => 4)));
-        
+
         $query = $this->db->table('foobar');
         $this->assertEquals(5, $query->count());
-        $this->assertEquals(3, $query->count('a', true));
-        $this->assertEquals(4, $query->count('b', true));
+        $this->assertEquals(5, $query->count('a'));
+        $this->assertEquals(5, $query->count('b'));
 
         $query->eq('b', 3);
         $this->assertEquals(2, $query->count());
-        $this->assertEquals(2, $query->count('a', true));
-        $this->assertEquals(1, $query->count('b', true));
+        $this->assertEquals(1, $query->count('a'));
+        $this->assertEquals(2, $query->count('b'));
+
+        $distinctQuery = $this->db
+            ->table('foobar')
+            ->distinct();
+        $this->assertEquals(5, $distinctQuery->count());
+        $this->assertEquals(3, $distinctQuery->count('a'));
+        $this->assertEquals(4, $distinctQuery->count('b'));
     }
 
     public function testCustomCondition()

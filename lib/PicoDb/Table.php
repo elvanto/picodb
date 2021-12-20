@@ -382,16 +382,23 @@ class Table
      * Exists
      *
      * @access public
-     * @return integer
+     * @return bool
      */
     public function exists()
     {
         $sql = sprintf(
-            'SELECT 1 FROM %s '.implode(' ', $this->joins).$this->conditionBuilder->build(),
-            $this->db->escapeIdentifier($this->name)
+            'SELECT 1 FROM %s %s %s %s %s %s %s %s',
+            $this->db->escapeIdentifier($this->name),
+            implode(' ', $this->joins),
+            $this->conditionBuilder->build(),
+            empty($this->groupBy) ? '' : 'GROUP BY '.implode(', ', $this->groupBy),
+            $this->aggregatedConditionBuilder->build(),
+            $this->sqlOrder,
+            $this->sqlLimit,
+            $this->sqlOffset
         );
 
-        $rq = $this->db->execute($sql, $this->conditionBuilder->getValues());
+        $rq = $this->db->execute($sql, array_merge($this->conditionBuilder->getValues(), $this->aggregatedConditionBuilder->getValues()));
         $result = $rq->fetchColumn();
 
         return $result ? true : false;
@@ -402,25 +409,28 @@ class Table
      *
      * @access public
      * @param string $column
-     * @param bool $distinct
      * @return integer
      */
-    public function count(string $column = '*', bool $distinct = false)
+    public function count(string $column = '*')
     {
         if ($column != '*') {
-            $column = $this->db->escapeIdentifier($column);
+            $column = ($this->distinct() ? 'DISTINCT ' : '') . $this->db->escapeIdentifier($column);
         }
 
-        if ($distinct) {
-            $column = 'DISTINCT ' . $column;
-        }
 
         $sql = sprintf(
-            'SELECT COUNT(' . $column . ') FROM %s '.implode(' ', $this->joins).$this->conditionBuilder->build().$this->sqlOrder.$this->sqlLimit.$this->sqlOffset,
-            $this->db->escapeIdentifier($this->name)
+            'SELECT COUNT(' . $column . ') FROM %s %s %s %s %s %s %s %s',
+            $this->db->escapeIdentifier($this->name),
+            implode(' ', $this->joins),
+            $this->conditionBuilder->build(),
+            empty($this->groupBy) ? '' : 'GROUP BY '.implode(', ', $this->groupBy),
+            $this->aggregatedConditionBuilder->build(),
+            $this->sqlOrder,
+            $this->sqlLimit,
+            $this->sqlOffset
         );
 
-        $rq = $this->db->execute($sql, $this->conditionBuilder->getValues());
+        $rq = $this->db->execute($sql, array_merge($this->conditionBuilder->getValues(), $this->aggregatedConditionBuilder->getValues()));
         $result = $rq->fetchColumn();
 
         return $result ? (int) $result : 0;
@@ -436,13 +446,18 @@ class Table
     public function sum(string $column)
     {
         $sql = sprintf(
-            'SELECT SUM(%s) FROM %s '.implode(' ', $this->joins).$this->conditionBuilder->build().$this->sqlOrder.$this->sqlLimit.$this->sqlOffset,
-            $this->db->escapeIdentifier($column),
-            $this->db->escapeIdentifier($this->name)
+            'SELECT SUM(%s) FROM %s %s %s %s %s %s %s %s',
+            $this->db->escapeIdentifier($this->name),
+            implode(' ', $this->joins),
+            $this->conditionBuilder->build(),
+            empty($this->groupBy) ? '' : 'GROUP BY '.implode(', ', $this->groupBy),
+            $this->aggregatedConditionBuilder->build(),
+            $this->sqlOrder,
+            $this->sqlLimit,
+            $this->sqlOffset
         );
 
-        $rq = $this->db->execute($sql, $this->conditionBuilder->getValues());
-        $result = $rq->fetchColumn();
+        $rq = $this->db->execute($sql, array_merge($this->conditionBuilder->getValues(), $this->aggregatedConditionBuilder->getValues()));
 
         return $result ? (float) $result : 0;
     }
