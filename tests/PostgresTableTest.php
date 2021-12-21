@@ -311,7 +311,7 @@ class PostgresTableTest extends \PHPUnit\Framework\TestCase
             ->inSubquery('foo', $subQuery);
 
         $this->assertEquals([100], $query->getAggregatedConditionBuilder()->getValues());
-        $this->assertEquals(4, $query->count());
+        $this->assertEquals(2, $query->count());
     }
 
     public function testCustomCondition()
