@@ -302,10 +302,11 @@ class MysqlTableTest extends \PHPUnit\Framework\TestCase
 
         $subQuery = $this->db
             ->table('foobar')
+            ->select('foo')
             ->neq('foo', 2)
             ->groupBy('foobar.foo')
             ->having()
-            ->gt('SUM(foobar.bar)', 100);
+            ->gt('SUM( bar )', 100);
 
         $query = $this->db->table('foo')
             ->inSubquery('foo', $subQuery);
