@@ -302,17 +302,16 @@ class MysqlTableTest extends \PHPUnit\Framework\TestCase
 
         $subQuery = $this->db
             ->table('foobar')
-            ->select('foo')
-            ->gt('SUM(foobar.bar)', 100)
+            ->neq('foo', 2)
             ->groupBy('foobar.foo')
             ->having()
-            ->neq('foo', 2);
+            ->gt('SUM(foobar.bar)', 100);
 
         $query = $this->db->table('foo')
             ->inSubquery('foo', $subQuery);
 
         $this->assertEquals([2], $query->getAggregatedConditionBuilder()->getValues());
-        $this->assertEquals(4, $query->count());
+        $this->assertEquals(2, $query->count());
     }
 
     public function testCustomCondition()
