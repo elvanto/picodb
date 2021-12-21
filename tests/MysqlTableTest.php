@@ -310,7 +310,7 @@ class MysqlTableTest extends \PHPUnit\Framework\TestCase
         $query = $this->db->table('foo')
             ->inSubquery('foo', $subQuery);
 
-        $this->assertEquals([2], $query->getAggregatedConditionBuilder()->getValues());
+        $this->assertEquals([100], $query->getAggregatedConditionBuilder()->getValues());
         $this->assertEquals(2, $query->count());
     }
 
