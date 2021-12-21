@@ -277,6 +277,43 @@ class PostgresTableTest extends \PHPUnit\Framework\TestCase
 
     }
 
+    public function testCountSubQueryHaving()
+    {
+        $this->assertNotFalse($this->db->execute('CREATE TABLE foo (foo INTEGER)'));
+        $this->assertNotFalse($this->db->execute('CREATE TABLE foobar (foo INTEGER, bar INTEGER)'));
+
+        $this->assertTrue($this->db->table('foo')->insert(['foo' => 1]));
+        $this->assertTrue($this->db->table('foo')->insert(['foo' => 2]));
+        $this->assertTrue($this->db->table('foo')->insert(['foo' => 3]));
+        $this->assertTrue($this->db->table('foo')->insert(['foo' => 4]));
+        $this->assertTrue($this->db->table('foo')->insert(['foo' => 5]));
+
+        $this->assertTrue($this->db->table('foobar')->insert(['foo' => 1, 'bar' => 128]));
+        $this->assertTrue($this->db->table('foobar')->insert(['foo' => 2, 'bar' => 542]));
+        $this->assertTrue($this->db->table('foobar')->insert(['foo' => 3, 'bar' => 8]));
+        $this->assertTrue($this->db->table('foobar')->insert(['foo' => 4, 'bar' => 9]));
+        $this->assertTrue($this->db->table('foobar')->insert(['foo' => 5, 'bar' => 643]));
+        $this->assertTrue($this->db->table('foobar')->insert(['foo' => 1, 'bar' => 12]));
+        $this->assertTrue($this->db->table('foobar')->insert(['foo' => 2, 'bar' => 6]));
+        $this->assertTrue($this->db->table('foobar')->insert(['foo' => 3, 'bar' => 85]));
+        $this->assertTrue($this->db->table('foobar')->insert(['foo' => 4, 'bar' => 91]));
+        $this->assertTrue($this->db->table('foobar')->insert(['foo' => 5, 'bar' => 643]));
+
+        $subQuery = $this->db
+            ->table('foobar')
+            ->select('foo')
+            ->neq('foo', 2)
+            ->groupBy('foobar.foo')
+            ->having()
+            ->gt('bar', 100);
+
+        $query = $this->db->table('foo')
+            ->inSubquery('foo', $subQuery);
+
+        $this->assertEquals([100], $query->getAggregatedConditionBuilder()->getValues());
+        $this->assertEquals(2, $query->count());
+    }
+
     public function testCustomCondition()
     {
         $table = $this->db->table('test');
