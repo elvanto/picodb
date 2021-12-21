@@ -305,13 +305,13 @@ class PostgresTableTest extends \PHPUnit\Framework\TestCase
             ->neq('foo', 2)
             ->groupBy('foobar.foo')
             ->having()
-            ->gt('bar', 100);
+            ->gt('SUM(foobar.bar)', 100);
 
         $query = $this->db->table('foo')
             ->inSubquery('foo', $subQuery);
 
         $this->assertEquals([100], $query->getAggregatedConditionBuilder()->getValues());
-        $this->assertEquals(2, $query->count());
+        $this->assertEquals(4, $query->count());
     }
 
     public function testCustomCondition()
