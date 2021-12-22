@@ -139,6 +139,14 @@ class Table
     private $joins = array();
 
     /**
+     * Values for subqueries used in joins
+     *
+     * @access private
+     * @var array
+     */
+    private $joinValues = array();
+
+    /**
      * Use DISTINCT or not?
      *
      * @access private
@@ -310,7 +318,7 @@ class Table
      */
     public function findAll()
     {
-        $rq = $this->db->execute($this->buildSelectQuery(), array_merge($this->conditionBuilder->getValues(), $this->aggregatedConditionBuilder->getValues()));
+        $rq = $this->db->execute($this->buildSelectQuery(), array_merge($this->joinValues, $this->conditionBuilder->getValues(), $this->aggregatedConditionBuilder->getValues()));
         $results = $rq->fetchAll(PDO::FETCH_ASSOC);
 
         if (is_callable($this->callback) && ! empty($results)) {
@@ -580,7 +588,11 @@ class Table
             $this->db->escapeIdentifier($local_table ?: $this->name).'.'.$this->db->escapeIdentifier($local_column)
         );
 
-        $this->getConditionBuilder()->addValues(array_merge($subQuery->getConditionBuilder()->getValues(), $subQuery->getAggregatedConditionBuilder()->getValues()));
+        $this->joinValues = array_merge(
+            $this->joinValues,
+            $subQuery->getConditionBuilder()->getValues(),
+            $subQuery->getAggregatedConditionBuilder()->getValues()
+        );
 
         return $this;
     }
@@ -597,18 +609,18 @@ class Table
      */
     public function innerJoinSubquery(Table $subQuery, string $alias, string $foreign_column, string $local_column, string $local_table = ''): Table
     {
-        $joinSql = str_replace(
-            '?',
-            array_merge($subQuery->getConditionBuilder()->getValues(), $this->getAggregatedConditionBuilder()->getValues()),
-            $subQuery->buildSelectQuery()
-        );
-
         $this->joins[] = sprintf(
             'INNER JOIN (%s) AS %s ON %s=%s',
-            $joinSql,
+            $subQuery->buildSelectQuery(),
             $this->db->escapeIdentifier($alias),
             $this->db->escapeIdentifier($alias).'.'.$this->db->escapeIdentifier($foreign_column),
             $this->db->escapeIdentifier($local_table ?: $this->name).'.'.$this->db->escapeIdentifier($local_column)
+        );
+
+        $this->joinValues = array_merge(
+            $this->joinValues,
+            $subQuery->getConditionBuilder()->getValues(),
+            $subQuery->getAggregatedConditionBuilder()->getValues()
         );
 
         return $this;
