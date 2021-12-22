@@ -142,6 +142,14 @@ class Table
     private $joins = array();
 
     /**
+     * Values for subqueries used in joins
+     *
+     * @access private
+     * @var array
+     */
+    private $joinValues = array();
+
+    /**
      * Use DISTINCT or not?
      *
      * @access private
@@ -313,7 +321,7 @@ class Table
      */
     public function findAll()
     {
-        $rq = $this->db->execute($this->buildSelectQuery(), array_merge($this->conditionBuilder->getValues(), $this->aggregatedConditionBuilder->getValues()));
+        $rq = $this->db->execute($this->buildSelectQuery(), $this->getValues());
         $results = $rq->fetchAll(PDO::FETCH_ASSOC);
 
         if (is_callable($this->callback) && ! empty($results)) {
@@ -333,7 +341,7 @@ class Table
     public function findAllByColumn($column)
     {
         $this->columns = array($column);
-        $rq = $this->db->execute($this->buildSelectQuery(), array_merge($this->conditionBuilder->getValues(), $this->aggregatedConditionBuilder->getValues()));
+        $rq = $this->db->execute($this->buildSelectQuery(), $this->getValues());
 
         return $rq->fetchAll(PDO::FETCH_COLUMN, 0);
     }
@@ -364,7 +372,7 @@ class Table
         $this->limit(1);
         $this->columns = array($column);
 
-        return $this->db->execute($this->buildSelectQuery(), array_merge($this->conditionBuilder->getValues(), $this->aggregatedConditionBuilder->getValues()))->fetchColumn();
+        return $this->db->execute($this->buildSelectQuery(), $this->getValues())->fetchColumn();
     }
 
     /**
@@ -401,7 +409,7 @@ class Table
             $this->sqlOffset
         );
 
-        $rq = $this->db->execute($sql, array_merge($this->conditionBuilder->getValues(), $this->aggregatedConditionBuilder->getValues()));
+        $rq = $this->db->execute($sql,  $this->getValues());
         $result = $rq->fetchColumn();
 
         return $result ? true : false;
@@ -433,7 +441,7 @@ class Table
             $this->sqlOffset
         );
 
-        $rq = $this->db->execute($sql, array_merge($this->conditionBuilder->getValues(), $this->aggregatedConditionBuilder->getValues()));
+        $rq = $this->db->execute($sql,  $this->getValues());
         $result = $rq->fetchColumn();
 
         return $result ? (int) $result : 0;
@@ -461,7 +469,7 @@ class Table
             $this->sqlOffset
         );
 
-        $rq = $this->db->execute($sql, array_merge($this->conditionBuilder->getValues(), $this->aggregatedConditionBuilder->getValues()));
+        $rq = $this->db->execute($sql, $this->getValues());
         $result = $rq->fetchColumn();
 
         return $result ? (float) $result : 0;
@@ -575,6 +583,64 @@ class Table
             $this->db->escapeIdentifier($alias1),
             $this->db->escapeIdentifier($alias1).'.'.$this->db->escapeIdentifier($column1),
             $this->db->escapeIdentifier($table2).'.'.$this->db->escapeIdentifier($column2)
+        );
+
+        return $this;
+    }
+
+    /**
+     * Join your table onto a subquery.
+     *
+     * @param Table $subQuery
+     * @param string $alias
+     * @param string $foreign_column
+     * @param string $local_column
+     * @param string $local_table
+     * @return Table
+     */
+    public function joinSubquery(Table $subQuery, string $alias, string $foreign_column, string $local_column, string $local_table = ''): Table
+    {
+        $this->joins[] = sprintf(
+            'LEFT JOIN (%s) AS %s ON %s=%s',
+            $subQuery->buildSelectQuery(),
+            $this->db->escapeIdentifier($alias),
+            $this->db->escapeIdentifier($alias).'.'.$this->db->escapeIdentifier($foreign_column),
+            $this->db->escapeIdentifier($local_table ?: $this->name).'.'.$this->db->escapeIdentifier($local_column)
+        );
+
+        $this->joinValues = array_merge(
+            $this->joinValues,
+            $subQuery->getConditionBuilder()->getValues(),
+            $subQuery->getAggregatedConditionBuilder()->getValues()
+        );
+
+        return $this;
+    }
+
+    /**
+     * Inner Join your table onto a subquery.
+     *
+     * @param Table $subQuery
+     * @param string $alias
+     * @param string $foreign_column
+     * @param string $local_column
+     * @param string $local_table
+     * @return Table
+     */
+    public function innerJoinSubquery(Table $subQuery, string $alias, string $foreign_column, string $local_column, string $local_table = ''): Table
+    {
+        $this->joins[] = sprintf(
+            'INNER JOIN (%s) AS %s ON %s=%s',
+            $subQuery->buildSelectQuery(),
+            $this->db->escapeIdentifier($alias),
+            $this->db->escapeIdentifier($alias).'.'.$this->db->escapeIdentifier($foreign_column),
+            $this->db->escapeIdentifier($local_table ?: $this->name).'.'.$this->db->escapeIdentifier($local_column)
+        );
+
+        $this->joinValues = array_merge(
+            $this->joinValues,
+            $subQuery->getConditionBuilder()->getValues(),
+            $subQuery->getAggregatedConditionBuilder()->getValues()
         );
 
         return $this;
@@ -833,4 +899,13 @@ class Table
              $this->aggregatedConditionBuilder->addValues($subquery->getAggregatedConditionBuilder()->getValues());
          }
      }
+
+     private function getValues()
+    {
+        return array_merge(
+            $this->joinValues,
+            $this->getConditionBuilder()->getValues(),
+            $this->getAggregatedConditionBuilder()->getValues()
+        );
+    }
 }
