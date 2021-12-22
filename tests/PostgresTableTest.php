@@ -411,6 +411,44 @@ class PostgresTableTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(7, $this->db->table('foobar')->sum('a'));
     }
 
+    public function testSumSubqueryHaving()
+    {
+        $this->assertNotFalse($this->db->execute('CREATE TABLE foobar(foo INTEGER, status INTEGER DEFAULT 0)'));
+        $this->assertNotFalse($this->db->execute('CREATE TABLE foopoints(foo INTEGER, points INTEGER)'));
+
+        $this->assertNotFalse($this->db->table('foobar')->insert(array('foo'=>1, 'status'=>0)));
+        $this->assertNotFalse($this->db->table('foobar')->insert(array('foo'=>2, 'status'=>0)));
+        $this->assertNotFalse($this->db->table('foobar')->insert(array('foo'=>3, 'status'=>1)));
+        $this->assertNotFalse($this->db->table('foobar')->insert(array('foo'=>4, 'status'=>0)));
+        $this->assertNotFalse($this->db->table('foobar')->insert(array('foo'=>5, 'status'=>1)));
+
+        $this->assertNotFalse($this->db->table('foopoints')->insert(array('foo'=>1, 'points'=>8)));
+        $this->assertNotFalse($this->db->table('foopoints')->insert(array('foo'=>1, 'points'=>2)));
+        $this->assertNotFalse($this->db->table('foopoints')->insert(array('foo'=>2, 'points'=>18)));
+        $this->assertNotFalse($this->db->table('foopoints')->insert(array('foo'=>2, 'points'=>3)));
+        $this->assertNotFalse($this->db->table('foopoints')->insert(array('foo'=>3, 'points'=>7)));
+        $this->assertNotFalse($this->db->table('foopoints')->insert(array('foo'=>3, 'points'=>8)));
+        $this->assertNotFalse($this->db->table('foopoints')->insert(array('foo'=>4, 'points'=>12)));
+        $this->assertNotFalse($this->db->table('foopoints')->insert(array('foo'=>4, 'points'=>7)));
+        $this->assertNotFalse($this->db->table('foopoints')->insert(array('foo'=>5, 'points'=>18)));
+        $this->assertNotFalse($this->db->table('foopoints')->insert(array('foo'=>5, 'points'=>8)));
+
+        $subQuery = $this->db
+            ->table('foopoints')
+            ->select('foo')
+            ->groupBy('foo')
+            ->having()
+            ->gt('SUM(points)', 15);
+
+        $query = $this->db
+            ->table('foobar')
+            ->inSubquery('foo', $subQuery);
+
+        $this->assertEquals(6, $query->sum('foo'));
+
+        $this->db->execute('DROP TABLE IF EXISTS foopoints');
+    }
+
     public function testIncrement()
     {
         $this->assertNotFalse($this->db->execute('CREATE TABLE foobar (a INTEGER DEFAULT 0, b INTEGER DEFAULT 0)'));
