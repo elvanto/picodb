@@ -443,6 +443,7 @@ class MysqlTableTest extends \PHPUnit\Framework\TestCase
 
         $query = $this->db
             ->table('foobar')
+            ->eq('status', 0)
             ->inSubquery('foo', $subQuery);
 
         $this->assertEquals('SELECT * FROM `foobar`   WHERE `foo` IN (SELECT foo FROM `foopoints`   GROUP BY `foo`  HAVING SUM(foopoints.points) > ?)', $query->buildSelectQuery());

@@ -530,11 +530,12 @@ class SqliteTableTest extends \PHPUnit\Framework\TestCase
 
         $query = $this->db
             ->table('foobar')
+            ->eq('status', 0)
             ->inSubquery('foo', $subQuery);
 
         $this->assertEquals('SELECT * FROM "foobar"   WHERE "foo" IN (SELECT foo FROM "foopoints"   GROUP BY "foo"  HAVING "points" > ?)', $query->buildSelectQuery());
         $this->assertEquals([10], $query->getAggregatedConditionBuilder()->getValues());
-        $this->assertEquals(11, $query->sum('foo'));
+        $this->assertEquals(6, $query->sum('foo'));
 
         $this->db->execute('DROP TABLE IF EXISTS foopoints');
     }
