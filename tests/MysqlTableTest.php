@@ -439,12 +439,14 @@ class MysqlTableTest extends \PHPUnit\Framework\TestCase
             ->select('foo')
             ->groupBy('foo')
             ->having()
-            ->gt('SUM( points )', 15);
+            ->gt('SUM(foopoints.points)', 15);
 
         $query = $this->db
             ->table('foobar')
             ->inSubquery('foo', $subQuery);
 
+        $this->assertEquals('SELECT * FROM `foobar`   WHERE `foo` IN (SELECT foo FROM `foopoints`   GROUP BY `foo`  HAVING SUM(foopoints.points) > ?)', $query->buildSelectQuery());
+        $this->assertEquals([15], $query->getAggregatedConditionBuilder()->getValues());
         $this->assertEquals(6, $query->sum('foo'));
 
         $this->db->execute('DROP TABLE IF EXISTS foopoints');
