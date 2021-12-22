@@ -510,7 +510,7 @@ class SqliteTableTest extends \PHPUnit\Framework\TestCase
         $this->assertNotFalse($this->db->table('foobar')->insert(array('foo'=>4, 'status'=>0)));
         $this->assertNotFalse($this->db->table('foobar')->insert(array('foo'=>5, 'status'=>1)));
 
-        $this->assertNotFalse($this->db->table('foopoints')->insert(array('foo'=>1, 'points'=>8)));
+        $this->assertNotFalse($this->db->table('foopoints')->insert(array('foo'=>1, 'points'=>10)));
         $this->assertNotFalse($this->db->table('foopoints')->insert(array('foo'=>1, 'points'=>2)));
         $this->assertNotFalse($this->db->table('foopoints')->insert(array('foo'=>2, 'points'=>18)));
         $this->assertNotFalse($this->db->table('foopoints')->insert(array('foo'=>2, 'points'=>3)));
@@ -533,7 +533,7 @@ class SqliteTableTest extends \PHPUnit\Framework\TestCase
             ->eq('status', 0)
             ->inSubquery('foo', $subQuery);
 
-        $this->assertEquals('SELECT * FROM "foobar"   WHERE "foo" IN (SELECT foo FROM "foopoints"   GROUP BY "foo"  HAVING "points" > ?)', $query->buildSelectQuery());
+        $this->assertEquals('SELECT * FROM "foobar"   WHERE "status" = ? AND "foo" IN (SELECT foo FROM "foopoints"   GROUP BY "foo"  HAVING "points" > ?)', $query->buildSelectQuery());
         $this->assertEquals([10], $query->getAggregatedConditionBuilder()->getValues());
         $this->assertEquals(6, $query->sum('foo'));
 
