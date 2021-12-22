@@ -318,7 +318,7 @@ class Table
      */
     public function findAll()
     {
-        $rq = $this->db->execute($this->buildSelectQuery(), array_merge($this->joinValues, $this->conditionBuilder->getValues(), $this->aggregatedConditionBuilder->getValues()));
+        $rq = $this->db->execute($this->buildSelectQuery(), $this->getValues());
         $results = $rq->fetchAll(PDO::FETCH_ASSOC);
 
         if (is_callable($this->callback) && ! empty($results)) {
@@ -338,7 +338,7 @@ class Table
     public function findAllByColumn($column)
     {
         $this->columns = array($column);
-        $rq = $this->db->execute($this->buildSelectQuery(), array_merge($this->conditionBuilder->getValues(), $this->aggregatedConditionBuilder->getValues()));
+        $rq = $this->db->execute($this->buildSelectQuery(), $this->getValues());
 
         return $rq->fetchAll(PDO::FETCH_COLUMN, 0);
     }
@@ -369,7 +369,7 @@ class Table
         $this->limit(1);
         $this->columns = array($column);
 
-        return $this->db->execute($this->buildSelectQuery(), array_merge($this->conditionBuilder->getValues(), $this->aggregatedConditionBuilder->getValues()))->fetchColumn();
+        return $this->db->execute($this->buildSelectQuery(), $this->getValues())->fetchColumn();
     }
 
     /**
@@ -879,4 +879,13 @@ class Table
              $this->aggregatedConditionBuilder->addValues($subquery->getAggregatedConditionBuilder()->getValues());
          }
      }
+
+     private function getValues()
+    {
+        return array_merge(
+            $this->joinValues,
+            $this->getConditionBuilder()->getValues(),
+            $this->getAggregatedConditionBuilder()->getValues()
+        );
+    }
 }
