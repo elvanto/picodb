@@ -484,6 +484,104 @@ class PostgresTableTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testJoinSubquery()
+    {
+        $this->assertNotFalse($this->db->execute('CREATE TABLE test1 (id INTEGER NOT NULL, a INTEGER NOT NULL)'));
+        $this->assertNotFalse($this->db->execute('CREATE TABLE test2 (foreign_key INTEGER NOT NULL, b INTEGER)'));
+
+        $this->assertTrue($this->db->table('test1')->insert(array('id'=> 1, 'a' => 5)));
+        $this->assertTrue($this->db->table('test1')->insert(array('id'=> 2, 'a' => 1)));
+        $this->assertTrue($this->db->table('test1')->insert(array('id'=> 3, 'a' => 14)));
+        $this->assertTrue($this->db->table('test1')->insert(array('id'=> 4, 'a' => 6)));
+        $this->assertTrue($this->db->table('test1')->insert(array('id'=> 5, 'a' => 12)));
+
+        $this->assertTrue($this->db->table('test2')->insert(array('foreign_key'=> 1, 'b' => 185)));
+        $this->assertTrue($this->db->table('test2')->insert(array('foreign_key'=> 2, 'b' => 146)));
+        $this->assertTrue($this->db->table('test2')->insert(array('foreign_key'=> 3, 'b' => 185)));
+        $this->assertTrue($this->db->table('test2')->insert(array('foreign_key'=> 4, 'b' => 34)));
+        $this->assertTrue($this->db->table('test2')->insert(array('foreign_key'=> 5, 'b' => 121)));
+
+        $subQuery = $this->db
+            ->table('test2')
+            ->eq('b', 185);
+
+        $query = $this->db
+            ->table('test1 t1')
+            ->joinSubquery($subQuery, 'b', 'foreign_key', 'id', 't1')
+            ->select('id, a, b');
+
+        $this->assertEquals(
+            'SELECT id, a, b FROM test1 t1 LEFT JOIN (SELECT * FROM "test2"   WHERE "b" = ?) AS "b" ON "b"."foreign_key"="t1"."id"',
+            $query->buildSelectQuery()
+        );
+
+        $results = $query->findAll();
+        $this->assertCount(5, $results);
+        $this->assertEquals(
+            ['id' => 1, 'a' => 5, 'b' => 185],
+            $results[0]
+        );
+        $this->assertEquals(
+            ['id' => 2, 'a' => 1, 'b' => null],
+            $results[1]
+        );
+        $this->assertEquals(
+            ['id' => 3, 'a' => 14, 'b' => 185],
+            $results[2]
+        );
+        $this->assertEquals(
+            ['id' => 4, 'a' => 6, 'b' => null],
+            $results[3]
+        );
+        $this->assertEquals(
+            ['id' => 5, 'a' => 12, 'b' => null],
+            $results[4]
+        );
+    }
+
+    public function testInnerJoinSubquery()
+    {
+        $this->assertNotFalse($this->db->execute('CREATE TABLE test1 (id INTEGER NOT NULL, a INTEGER NOT NULL)'));
+        $this->assertNotFalse($this->db->execute('CREATE TABLE test2 (foreign_key INTEGER NOT NULL, b INTEGER)'));
+
+        $this->assertTrue($this->db->table('test1')->insert(array('id'=> 1, 'a' => 5)));
+        $this->assertTrue($this->db->table('test1')->insert(array('id'=> 2, 'a' => 1)));
+        $this->assertTrue($this->db->table('test1')->insert(array('id'=> 3, 'a' => 14)));
+        $this->assertTrue($this->db->table('test1')->insert(array('id'=> 4, 'a' => 6)));
+        $this->assertTrue($this->db->table('test1')->insert(array('id'=> 5, 'a' => 12)));
+
+        $this->assertTrue($this->db->table('test2')->insert(array('foreign_key'=> 1, 'b' => 185)));
+        $this->assertTrue($this->db->table('test2')->insert(array('foreign_key'=> 2, 'b' => 146)));
+        $this->assertTrue($this->db->table('test2')->insert(array('foreign_key'=> 3, 'b' => 185)));
+        $this->assertTrue($this->db->table('test2')->insert(array('foreign_key'=> 4, 'b' => 34)));
+        $this->assertTrue($this->db->table('test2')->insert(array('foreign_key'=> 5, 'b' => 121)));
+
+        $subQuery = $this->db
+            ->table('test2')
+            ->eq('b', 185);
+
+        $query = $this->db
+            ->table('test1 t1')
+            ->innerJoinSubquery($subQuery, 'b', 'foreign_key', 'id', 't1')
+            ->select('id, a, b');
+
+        $this->assertEquals(
+            'SELECT id, a, b FROM test1 t1 INNER JOIN (SELECT * FROM "test2"   WHERE "b" = ?) AS "b" ON "b"."foreign_key"="t1"."id"',
+            $query->buildSelectQuery()
+        );
+
+        $results = $query->findAll();
+        $this->assertCount(2, $results);
+        $this->assertEquals(
+            ['id' => 1, 'a' => 5, 'b' => 185],
+            $results[0]
+        );
+        $this->assertEquals(
+            ['id' => 3, 'a' => 14, 'b' => 185],
+            $results[1]
+        );
+    }
+
     public function testHashTable()
     {
         $this->assertNotFalse($this->db->execute(
