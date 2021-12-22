@@ -507,11 +507,12 @@ class PostgresTableTest extends \PHPUnit\Framework\TestCase
 
         $query = $this->db
             ->table('test1 t1')
+            ->select('id, a, b')
             ->joinSubquery($subQuery, 'b', 'foreign_key', 'id', 't1')
-            ->select('id, a, b');
+            ->orderBy('id');
 
         $this->assertEquals(
-            'SELECT id, a, b FROM test1 t1 LEFT JOIN (SELECT * FROM "test2"   WHERE "b" = ?) AS "b" ON "b"."foreign_key"="t1"."id"',
+            'SELECT id, a, b FROM test1 t1 LEFT JOIN (SELECT * FROM "test2"   WHERE "b" = ?) AS "b" ON "b"."foreign_key"="t1"."id"     ORDER BY "id" ASC',
             $query->buildSelectQuery()
         );
 
@@ -562,11 +563,12 @@ class PostgresTableTest extends \PHPUnit\Framework\TestCase
 
         $query = $this->db
             ->table('test1 t1')
+            ->select('id, a, b')
             ->innerJoinSubquery($subQuery, 'b', 'foreign_key', 'id', 't1')
-            ->select('id, a, b');
+            ->orderBy('id');
 
         $this->assertEquals(
-            'SELECT id, a, b FROM test1 t1 INNER JOIN (SELECT * FROM "test2"   WHERE "b" = ?) AS "b" ON "b"."foreign_key"="t1"."id"',
+            'SELECT id, a, b FROM test1 t1 INNER JOIN (SELECT * FROM "test2"   WHERE "b" = ?) AS "b" ON "b"."foreign_key"="t1"."id"     ORDER BY "id" ASC',
             $query->buildSelectQuery()
         );
 
