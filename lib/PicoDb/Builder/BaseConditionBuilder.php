@@ -280,6 +280,18 @@ class BaseConditionBuilder
     }
 
     /**
+     * NOT LIKE condition
+     *
+     * @param $column
+     * @param $value
+     */
+    public function notLike($column, $value)
+    {
+        $this->addCondition($this->db->escapeIdentifier($column).' NOT LIKE ?');
+        $this->values[] = $value;
+    }
+
+    /**
      * Greater than condition
      *
      * @access public
@@ -381,6 +393,34 @@ class BaseConditionBuilder
     {
         $this->addCondition($this->db->escapeIdentifier($column).' <= ('.$subquery->buildSelectQuery().')');
         $this->values = array_merge($this->values, $subquery->getConditionBuilder()->getValues());
+    }
+
+    /**
+     * BETWEEN operator
+     *
+     * @param $column
+     * @param $lowValue
+     * @param $highValue
+     */
+    public function between($column, $lowValue, $highValue)
+    {
+        $this->addCondition($this->db->escapeIdentifier($column).' BETWEEN ? AND ?');
+        $this->values[] = $lowValue;
+        $this->values[] = $highValue;
+    }
+
+    /**
+     * NOT BETWEEN operator
+     *
+     * @param $column
+     * @param $lowValue
+     * @param $highValue
+     */
+    public function notBetween($column, $lowValue, $highValue)
+    {
+        $this->addCondition($this->db->escapeIdentifier($column).' NOT BETWEEN ? AND ?');
+        $this->values[] = $lowValue;
+        $this->values[] = $highValue;
     }
 
     /**

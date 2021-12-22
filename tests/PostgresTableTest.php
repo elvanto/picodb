@@ -67,6 +67,27 @@ class PostgresTableTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('SELECT * FROM "test"      ORDER BY "a" DESC, "b" ASC', $this->db->table('test')->desc('a')->asc('b')->buildSelectQuery());
     }
 
+    public function testLike()
+    {
+        $query = $this->db->table('test')->like('a', 'test');
+        $this->assertEquals('SELECT * FROM "test"   WHERE "a" LIKE ?', $query->buildSelectQuery());
+        $this->assertEquals('test', $query->getConditionBuilder()->getValues()[0]);
+    }
+
+    public function testIlike()
+    {
+        $query = $this->db->table('test')->ilike('a', 'test');
+        $this->assertEquals('SELECT * FROM "test"   WHERE "a" ILIKE ?', $query->buildSelectQuery());
+        $this->assertEquals('test', $query->getConditionBuilder()->getValues()[0]);
+    }
+
+    public function testNotLike()
+    {
+        $query = $this->db->table('test')->notLike('a', 'test');
+        $this->assertEquals('SELECT * FROM "test"   WHERE "a" NOT LIKE ?', $query->buildSelectQuery());
+        $this->assertEquals('test', $query->getConditionBuilder()->getValues()[0]);
+    }
+
     public function testLimit()
     {
         $this->assertEquals('SELECT * FROM "test"       LIMIT 10', $this->db->table('test')->limit(10)->buildSelectQuery());
@@ -206,6 +227,20 @@ class PostgresTableTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(array(5), $table->getConditionBuilder()->getValues());
     }
 
+    public function testBetween()
+    {
+        $query = $this->db->table('test')->between('a', 1, 5);
+        $this->assertEquals('SELECT * FROM "test"   WHERE "a" BETWEEN ? AND ?', $query->buildSelectQuery());
+        $this->assertEquals([1,5], $query->getConditionBuilder()->getValues());
+    }
+
+    public function testNotBetween()
+    {
+        $query = $this->db->table('test')->notBetween('a', 1, 5);
+        $this->assertEquals('SELECT * FROM "test"   WHERE "a" NOT BETWEEN ? AND ?', $query->buildSelectQuery());
+        $this->assertEquals([1,5], $query->getConditionBuilder()->getValues());
+    }
+
     public function testConditionIsNull()
     {
         $table = $this->db->table('test');
@@ -220,17 +255,63 @@ class PostgresTableTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->db->table('foobar')->insert(array('a' => 2, 'b' => 3)));
         $this->assertTrue($this->db->table('foobar')->insert(array('a' => 5, 'b' => 1)));
         $this->assertTrue($this->db->table('foobar')->insert(array('a' => 6, 'b' => 2)));
-        $this->assertTrue($this->db->table('foobar')->insert(array('a' => 5, 'b' => 3)));
+        $this->assertTrue($this->db->table('foobar')->insert(array('a' => null, 'b' => 3)));
         $this->assertTrue($this->db->table('foobar')->insert(array('a' => 2, 'b' => 4)));
+
         $query = $this->db->table('foobar');
         $this->assertEquals(5, $query->count());
-        $this->assertEquals(3, $query->count('a', true));
-        $this->assertEquals(4, $query->count('b', true));
+        $this->assertEquals(4, $query->count('a'));
+        $this->assertEquals(5, $query->count('b'));
 
         $query->eq('b', 3);
         $this->assertEquals(2, $query->count());
-        $this->assertEquals(2, $query->count('a', true));
-        $this->assertEquals(1, $query->count('b', true));
+        $this->assertEquals(1, $query->count('a'));
+        $this->assertEquals(2, $query->count('b'));
+
+        $distinctQuery = $this->db
+            ->table('foobar')
+            ->distinct();
+        $this->assertEquals(5, $distinctQuery->count());
+        $this->assertEquals(3, $distinctQuery->count('a'));
+        $this->assertEquals(4, $distinctQuery->count('b'));
+
+    }
+
+    public function testCountSubQueryHaving()
+    {
+        $this->assertNotFalse($this->db->execute('CREATE TABLE foo (foo INTEGER)'));
+        $this->assertNotFalse($this->db->execute('CREATE TABLE foobar (foo INTEGER, bar INTEGER)'));
+
+        $this->assertTrue($this->db->table('foo')->insert(['foo' => 1]));
+        $this->assertTrue($this->db->table('foo')->insert(['foo' => 2]));
+        $this->assertTrue($this->db->table('foo')->insert(['foo' => 3]));
+        $this->assertTrue($this->db->table('foo')->insert(['foo' => 4]));
+        $this->assertTrue($this->db->table('foo')->insert(['foo' => 5]));
+
+        $this->assertTrue($this->db->table('foobar')->insert(['foo' => 1, 'bar' => 128]));
+        $this->assertTrue($this->db->table('foobar')->insert(['foo' => 2, 'bar' => 542]));
+        $this->assertTrue($this->db->table('foobar')->insert(['foo' => 3, 'bar' => 8]));
+        $this->assertTrue($this->db->table('foobar')->insert(['foo' => 4, 'bar' => 9]));
+        $this->assertTrue($this->db->table('foobar')->insert(['foo' => 5, 'bar' => 643]));
+        $this->assertTrue($this->db->table('foobar')->insert(['foo' => 1, 'bar' => 12]));
+        $this->assertTrue($this->db->table('foobar')->insert(['foo' => 2, 'bar' => 6]));
+        $this->assertTrue($this->db->table('foobar')->insert(['foo' => 3, 'bar' => 85]));
+        $this->assertTrue($this->db->table('foobar')->insert(['foo' => 4, 'bar' => 91]));
+        $this->assertTrue($this->db->table('foobar')->insert(['foo' => 5, 'bar' => 643]));
+
+        $subQuery = $this->db
+            ->table('foobar')
+            ->select('foo')
+            ->neq('foo', 2)
+            ->groupBy('foobar.foo')
+            ->having()
+            ->gt('SUM(foobar.bar)', 100);
+
+        $query = $this->db->table('foo')
+            ->inSubquery('foo', $subQuery);
+
+        $this->assertEquals([100], $query->getAggregatedConditionBuilder()->getValues());
+        $this->assertEquals(2, $query->count());
     }
 
     public function testCustomCondition()
@@ -328,6 +409,47 @@ class PostgresTableTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->db->table('foobar')->insert(array('a' => 2)));
         $this->assertTrue($this->db->table('foobar')->insert(array('a' => 5)));
         $this->assertEquals(7, $this->db->table('foobar')->sum('a'));
+    }
+
+    public function testSumSubqueryHaving()
+    {
+        $this->assertNotFalse($this->db->execute('CREATE TABLE foobar(foo INTEGER, status INTEGER DEFAULT 0)'));
+        $this->assertNotFalse($this->db->execute('CREATE TABLE foopoints(foo INTEGER, points INTEGER)'));
+
+        $this->assertNotFalse($this->db->table('foobar')->insert(array('foo'=>1, 'status'=>0)));
+        $this->assertNotFalse($this->db->table('foobar')->insert(array('foo'=>2, 'status'=>0)));
+        $this->assertNotFalse($this->db->table('foobar')->insert(array('foo'=>3, 'status'=>1)));
+        $this->assertNotFalse($this->db->table('foobar')->insert(array('foo'=>4, 'status'=>0)));
+        $this->assertNotFalse($this->db->table('foobar')->insert(array('foo'=>5, 'status'=>1)));
+
+        $this->assertNotFalse($this->db->table('foopoints')->insert(array('foo'=>1, 'points'=>8)));
+        $this->assertNotFalse($this->db->table('foopoints')->insert(array('foo'=>1, 'points'=>2)));
+        $this->assertNotFalse($this->db->table('foopoints')->insert(array('foo'=>2, 'points'=>18)));
+        $this->assertNotFalse($this->db->table('foopoints')->insert(array('foo'=>2, 'points'=>3)));
+        $this->assertNotFalse($this->db->table('foopoints')->insert(array('foo'=>3, 'points'=>7)));
+        $this->assertNotFalse($this->db->table('foopoints')->insert(array('foo'=>3, 'points'=>8)));
+        $this->assertNotFalse($this->db->table('foopoints')->insert(array('foo'=>4, 'points'=>12)));
+        $this->assertNotFalse($this->db->table('foopoints')->insert(array('foo'=>4, 'points'=>7)));
+        $this->assertNotFalse($this->db->table('foopoints')->insert(array('foo'=>5, 'points'=>18)));
+        $this->assertNotFalse($this->db->table('foopoints')->insert(array('foo'=>5, 'points'=>8)));
+
+        $subQuery = $this->db
+            ->table('foopoints')
+            ->select('foo')
+            ->groupBy('foo')
+            ->having()
+            ->gt('SUM(foopoints.points)', 15);
+
+        $query = $this->db
+            ->table('foobar')
+            ->eq('status', 0)
+            ->inSubquery('foo', $subQuery);
+
+        $this->assertEquals('SELECT * FROM "foobar"   WHERE "status" = ? AND "foo" IN (SELECT foo FROM "foopoints"   GROUP BY "foo"  HAVING SUM(foopoints.points) > ?)', $query->buildSelectQuery());
+        $this->assertEquals([15], $query->getAggregatedConditionBuilder()->getValues());
+        $this->assertEquals(6, $query->sum('foo'));
+
+        $this->db->execute('DROP TABLE IF EXISTS foopoints');
     }
 
     public function testIncrement()
