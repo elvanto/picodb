@@ -409,7 +409,7 @@ class Table
             $this->sqlOffset
         );
 
-        $rq = $this->db->execute($sql, array_merge($this->conditionBuilder->getValues(), $this->aggregatedConditionBuilder->getValues()));
+        $rq = $this->db->execute($sql,  $this->getValues());
         $result = $rq->fetchColumn();
 
         return $result ? true : false;
@@ -441,7 +441,7 @@ class Table
             $this->sqlOffset
         );
 
-        $rq = $this->db->execute($sql, array_merge($this->conditionBuilder->getValues(), $this->aggregatedConditionBuilder->getValues()));
+        $rq = $this->db->execute($sql,  $this->getValues());
         $result = $rq->fetchColumn();
 
         return $result ? (int) $result : 0;
@@ -469,7 +469,7 @@ class Table
             $this->sqlOffset
         );
 
-        $rq = $this->db->execute($sql, array_merge($this->conditionBuilder->getValues(), $this->aggregatedConditionBuilder->getValues()));
+        $rq = $this->db->execute($sql, $this->getValues());
         $result = $rq->fetchColumn();
 
         return $result ? (float) $result : 0;
