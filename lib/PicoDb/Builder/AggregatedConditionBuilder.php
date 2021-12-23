@@ -3,7 +3,6 @@
 namespace PicoDb\Builder;
 
 use PicoDb\Database;
-use PicoDb\Table;
 
 /**
  * Class AggregatedConditionBuilder

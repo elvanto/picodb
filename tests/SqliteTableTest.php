@@ -356,7 +356,7 @@ class SqliteTableTest extends \PHPUnit\Framework\TestCase
         $query = $this->db->table('foo')
             ->inSubquery('foo', $subQuery);
 
-        $this->assertEquals([100], $query->getAggregatedConditionBuilder()->getValues());
+        $this->assertEquals([2, 100], $query->getConditionBuilder()->getValues());
         $this->assertEquals(2, $query->count());
     }
 
@@ -391,8 +391,7 @@ class SqliteTableTest extends \PHPUnit\Framework\TestCase
         $table->inSubquery('a', $subquery);
 
         $this->assertEquals('SELECT * FROM "test"   WHERE "a" IS NOT NULL AND ("b" = ? OR "c" >= ?) AND "a" IN (SELECT "a" FROM "test"   GROUP BY "a"  HAVING SUM( d ) >= ?)', $table->buildSelectQuery());
-        $this->assertEquals(array(2, 5), $table->getConditionBuilder()->getValues());
-        $this->assertEquals(array(10), $table->getAggregatedConditionBuilder()->getValues());
+        $this->assertEquals(array(2, 5, 10), $table->getConditionBuilder()->getValues());
     }
 
     public function testMultipleOrConditions()
@@ -534,7 +533,7 @@ class SqliteTableTest extends \PHPUnit\Framework\TestCase
             ->inSubquery('foo', $subQuery);
 
         $this->assertEquals('SELECT * FROM "foobar"   WHERE "status" = ? AND "foo" IN (SELECT foo FROM "foopoints"   GROUP BY "foo"  HAVING "points" > ?)', $query->buildSelectQuery());
-        $this->assertEquals([10], $query->getAggregatedConditionBuilder()->getValues());
+        $this->assertEquals([0, 10], $query->getConditionBuilder()->getValues());
         $this->assertEquals(6, $query->sum('foo'));
 
         $this->db->execute('DROP TABLE IF EXISTS foopoints');

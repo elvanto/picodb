@@ -835,7 +835,7 @@ class Table
 
     /**
      * Sets the conditionalBuilder flag to use AggregateConditionBuilder (HAVING)
-     * 
+     *
      * @return $this
      */
     public function having()
@@ -870,37 +870,25 @@ class Table
         } else {
             call_user_func_array(array($this->conditionBuilder, $name), $arguments);
         }
-        if (count($arguments) == 2 && end($arguments) instanceof Table) {
-            $this->addSubqueryValues(end($arguments));
-        }
+
         return $this;
     }
 
     /**
      * Clone function ensures that cloned objects are really clones
      */
-     public function __clone()
-     {
-         $this->conditionBuilder = clone $this->conditionBuilder;
-         $this->aggregatedConditionBuilder = clone $this->aggregatedConditionBuilder;
-     }
+    public function __clone()
+    {
+        $this->conditionBuilder = clone $this->conditionBuilder;
+        $this->aggregatedConditionBuilder = clone $this->aggregatedConditionBuilder;
+    }
 
-     /**
-      * Adds values to builder when subquery is added to the other
-      *
-      * @access private
-      * @param  Table $subquery
-      */
-     private function addSubqueryValues(Table $subquery)
-     {
-         if ($this->conditionalBuilder === 'HAVING') {
-             $this->conditionBuilder->addValues($subquery->getConditionBuilder()->getValues());
-         } else {
-             $this->aggregatedConditionBuilder->addValues($subquery->getAggregatedConditionBuilder()->getValues());
-         }
-     }
-
-     private function getValues()
+    /**
+     * Values used to construct a select query
+     *
+     * @return array
+     */
+    public function getValues()
     {
         return array_merge(
             $this->joinValues,
