@@ -76,17 +76,6 @@ class BaseConditionBuilder
     }
 
     /**
-     * Adds condition values
-     *
-     * @access public
-     * @param  array $values
-     */
-    public function addValues($values)
-    {
-        $this->values = array_merge($this->values, $values);
-    }
-
-    /**
      * Returns true if there is some conditions
      *
      * @access public
@@ -222,7 +211,7 @@ class BaseConditionBuilder
     public function inSubquery($column, Table $subquery)
     {
         $this->addCondition($this->db->escapeIdentifier($column).' IN ('.$subquery->buildSelectQuery().')');
-        $this->values = array_merge($this->values, $subquery->getConditionBuilder()->getValues());
+        $this->values = array_merge($this->values, $subquery->getValues());
     }
 
     /**
@@ -250,7 +239,7 @@ class BaseConditionBuilder
     public function notInSubquery($column, Table $subquery)
     {
         $this->addCondition($this->db->escapeIdentifier($column).' NOT IN ('.$subquery->buildSelectQuery().')');
-        $this->values = array_merge($this->values, $subquery->getConditionBuilder()->getValues());
+        $this->values = array_merge($this->values, $subquery->getValues());
     }
 
     /**
@@ -314,7 +303,7 @@ class BaseConditionBuilder
     public function gtSubquery($column, Table $subquery)
     {
         $this->addCondition($this->db->escapeIdentifier($column).' > ('.$subquery->buildSelectQuery().')');
-        $this->values = array_merge($this->values, $subquery->getConditionBuilder()->getValues());
+        $this->values = array_merge($this->values, $subquery->getValues());
     }
 
     /**
@@ -340,7 +329,7 @@ class BaseConditionBuilder
     public function ltSubquery($column, Table $subquery)
     {
         $this->addCondition($this->db->escapeIdentifier($column).' < ('.$subquery->buildSelectQuery().')');
-        $this->values = array_merge($this->values, $subquery->getConditionBuilder()->getValues());
+        $this->values = array_merge($this->values, $subquery->getValues());
     }
 
     /**
@@ -366,7 +355,7 @@ class BaseConditionBuilder
     public function gteSubquery($column, Table $subquery)
     {
         $this->addCondition($this->db->escapeIdentifier($column).' >= ('.$subquery->buildSelectQuery().')');
-        $this->values = array_merge($this->values, $subquery->getConditionBuilder()->getValues());
+        $this->values = array_merge($this->values, $subquery->getValues());
     }
 
     /**
@@ -392,7 +381,7 @@ class BaseConditionBuilder
     public function lteSubquery($column, Table $subquery)
     {
         $this->addCondition($this->db->escapeIdentifier($column).' <= ('.$subquery->buildSelectQuery().')');
-        $this->values = array_merge($this->values, $subquery->getConditionBuilder()->getValues());
+        $this->values = array_merge($this->values, $subquery->getValues());
     }
 
     /**
