@@ -15,7 +15,8 @@
         }
     },
     "require": {
-        "php": ">=7.0"
+        "php": ">=7.0",
+        "ext-pdo": "*"
     },
     "autoload": {
         "psr-0": {"PicoDb": "lib/"}

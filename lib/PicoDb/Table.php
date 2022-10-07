@@ -365,7 +365,7 @@ class Table
      *
      * @access public
      * @param  string   $column
-     * @return string
+     * @return string|bool returns false if there are 0 results to get a column from.
      */
     public function findOneColumn($column)
     {
