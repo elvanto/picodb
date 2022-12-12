@@ -728,14 +728,14 @@ class Table
     }
 
     /**
-     * Group by
+     * Group By
      *
-     * @access public
+     * @param ...$columns
      * @return $this
      */
-    public function groupBy()
+    public function groupBy(...$columns)
     {
-        $this->groupBy = func_get_args();
+        $this->groupBy = $columns;
         return $this;
     }
 
