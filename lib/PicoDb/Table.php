@@ -730,7 +730,7 @@ class Table
     /**
      * Group By
      *
-     * @param ...$columns
+     * @param string ...$columns
      * @return $this
      */
     public function groupBy(...$columns)
