@@ -365,7 +365,7 @@ class Table
      *
      * @access public
      * @param  string   $column
-     * @return string
+     * @return string|bool returns false if there are 0 results to get a column from.
      */
     public function findOneColumn($column)
     {
@@ -728,14 +728,14 @@ class Table
     }
 
     /**
-     * Group by
+     * Group By
      *
-     * @access public
+     * @param string ...$columns
      * @return $this
      */
-    public function groupBy()
+    public function groupBy(...$columns)
     {
-        $this->groupBy = func_get_args();
+        $this->groupBy = $columns;
         return $this;
     }
 
