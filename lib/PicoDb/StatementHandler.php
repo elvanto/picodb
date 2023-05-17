@@ -298,7 +298,7 @@ class StatementHandler
         if ($this->logQueries) {
             $sql = $this->sql;
             if ($this->logQueryValues) {
-                $i = 0;
+                $i = -1;
                 $values = $this->lobParams;
                 return preg_replace_callback('/\?/', function() use ($values, &$i) {
                     $i++;
