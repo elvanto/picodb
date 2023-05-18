@@ -298,11 +298,12 @@ class StatementHandler
         if ($this->logQueries) {
             $sql = $this->sql;
             if ($this->logQueryValues) {
-                $i = -1;
+                $i = 0;
                 $values = $this->lobParams;
                 return preg_replace_callback('/\?/', function() use ($values, &$i) {
+                    $value = "'$values[$i]'" ?? '';
                     $i++;
-                    return $values[$i] ?? '';
+                    return $value;
                 }, $sql);
             }
             $this->db->setLogMessage($sql);
