@@ -55,6 +55,8 @@ class StatementHandlerTest extends TestCase
         $expectedLogs = [
             "SELECT * FROM `some_table` WHERE `someCoumn`='first value has a ? inside it' and `someOtherColumn`='second value'"
         ];
-        assertEquals($expectedLogs, $this->db->getLogMessages());
+
+        $logMessages = $this->db->getLogMessages();
+        self::assertEquals($expectedLogs, $logMessages, var_export($logMessages, true));
     }
 }
