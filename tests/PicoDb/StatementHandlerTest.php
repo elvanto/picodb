@@ -48,12 +48,12 @@ class StatementHandlerTest extends TestCase
         $statementHandler->testBeforeExecute([
             'logQueries' => true,
             'logQueryValues' => true,
-            'sql' => "SELECT * FROM `some_table` WHERE `someCoumn`='?' and `someOtherColumn`='?'",
+            'sql' => "SELECT * FROM `some_table` WHERE `someCoumn` = ? and `someOtherColumn` = ?",
             'lobParams' => ['first value has a ? inside it', 'second value']
         ]);
 
         $expectedLogs = [
-            "SELECT * FROM `some_table` WHERE `someCoumn`='first value has a ? inside it' and `someOtherColumn`='second value'"
+            "SELECT * FROM `some_table` WHERE `someCoumn` = 'first value has a ? inside it' and `someOtherColumn` = 'second value'"
         ];
 
         $logMessages = $this->db->getLogMessages();
