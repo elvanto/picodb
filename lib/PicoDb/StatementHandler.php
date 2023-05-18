@@ -298,13 +298,22 @@ class StatementHandler
         if ($this->logQueries) {
             $sql = $this->sql;
             if ($this->logQueryValues) {
-                $i = 0;
-                $values = $this->lobParams ?? $this->positionalParams ?? $this->namedParams;
-                $sql = preg_replace_callback('/\?/', function() use ($values, &$i) {
-                    $value = $values[$i] ?? '';
-                    $i++;
-                    return "'$value'";
-                }, $sql);
+                $params = $this->lobParams ?: $this->positionalParams ?: $this->namedParams;
+
+                if ($this->useNamedParams) {
+                    $sql = preg_replace_callback('/:([a-zA-Z0-9_]+)/', function ($matches) use ($params) {
+                        $paramName = $matches[1];
+                        $replacement = $params[$paramName] ?? $matches[0];
+                        return "'$replacement'";
+                    }, $sql);
+                } else {
+                    $i = 0;
+                    $sql = preg_replace_callback('/\?/', function($matches) use ($params, &$i) {
+                        $replacement = $params[$i] ?? '';
+                        $i++;
+                        return "'$replacement'";
+                    }, $sql);
+                }
             }
             $this->db->setLogMessage($sql);
         }

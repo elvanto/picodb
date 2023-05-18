@@ -50,6 +50,7 @@ class StatementHandlerTest extends TestCase
         $statementHandler->testBeforeExecute([
             'logQueries' => true,
             'logQueryValues' => true,
+            'useNamedParams' => false,
             'sql' => "SELECT * FROM `some_table` WHERE `someCoumn` = ? and `someOtherColumn` = ?",
             'lobParams' => ['first value has a ? inside it', 'second value'],
             'positionalParams' => [],
@@ -80,6 +81,25 @@ class StatementHandlerTest extends TestCase
         self::assertEquals(
             "SELECT * FROM `some_table` WHERE `someCoumn` = 'first value has a ? inside it' and `someOtherColumn` = 'second value'",
             $logMessages[1],
+            var_export($logMessages, true)
+        );
+
+        // now test with named params
+        $statementHandler->testBeforeExecute([
+            'logQueries' => true,
+            'logQueryValues' => true,
+            'useNamedParams' => true,
+            'sql' => "SELECT * FROM `some_table` WHERE `someCoumn` = :first and `someOtherColumn` = :second",
+            'lobParams' => [],
+            'positionalParams' => [],
+            'namedParams' => ['first' => 'first value has a ? inside it', 'second' => 'second value']
+        ]);
+
+        $logMessages = $this->db->getLogMessages();
+        self::assertCount(3, $logMessages);
+        self::assertEquals(
+            "SELECT * FROM `some_table` WHERE `someCoumn` = 'first value has a ? inside it' and `someOtherColumn` = 'second value'",
+            $logMessages[2],
             var_export($logMessages, true)
         );
     }
