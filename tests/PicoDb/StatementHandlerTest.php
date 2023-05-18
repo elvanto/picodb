@@ -32,7 +32,9 @@ class StatementHandlerTest extends TestCase
              *      'logQueries': boolean,
              *      'logQueryValues': boolean,
              *      'sql': string,
-             *      'lobParams': array
+             *      'lobParams': array,
+             *      'positionalParams': array,
+             *      'namedParams': array
              *     } $props
              * @return void
              */
@@ -49,14 +51,36 @@ class StatementHandlerTest extends TestCase
             'logQueries' => true,
             'logQueryValues' => true,
             'sql' => "SELECT * FROM `some_table` WHERE `someCoumn` = ? and `someOtherColumn` = ?",
-            'lobParams' => ['first value has a ? inside it', 'second value']
+            'lobParams' => ['first value has a ? inside it', 'second value'],
+            'positionalParams' => [],
+            'namedParams' => []
         ]);
 
-        $expectedLogs = [
-            "SELECT * FROM `some_table` WHERE `someCoumn` = 'first value has a ? inside it' and `someOtherColumn` = 'second value'"
-        ];
+        $logMessages = $this->db->getLogMessages();
+        self::assertCount(1, $logMessages);
+        self::assertEquals(
+            "SELECT * FROM `some_table` WHERE `someCoumn` = 'first value has a ? inside it' and `someOtherColumn` = 'second value'",
+            $logMessages[0],
+            var_export($logMessages, true)
+        );
+
+
+        // now test with positional params
+        $statementHandler->testBeforeExecute([
+            'logQueries' => true,
+            'logQueryValues' => true,
+            'sql' => "SELECT * FROM `some_table` WHERE `someCoumn` = ? and `someOtherColumn` = ?",
+            'lobParams' => [],
+            'positionalParams' => ['first value has a ? inside it', 'second value'],
+            'namedParams' => []
+        ]);
 
         $logMessages = $this->db->getLogMessages();
-        self::assertEquals($expectedLogs, $logMessages, var_export($logMessages, true));
+        self::assertCount(2, $logMessages);
+        self::assertEquals(
+            "SELECT * FROM `some_table` WHERE `someCoumn` = 'first value has a ? inside it' and `someOtherColumn` = 'second value'",
+            $logMessages[1],
+            var_export($logMessages, true)
+        );
     }
 }

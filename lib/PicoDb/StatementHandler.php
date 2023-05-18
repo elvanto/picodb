@@ -299,7 +299,7 @@ class StatementHandler
             $sql = $this->sql;
             if ($this->logQueryValues) {
                 $i = 0;
-                $values = $this->lobParams;
+                $values = $this->lobParams ?? $this->positionalParams ?? $this->namedParams;
                 $sql = preg_replace_callback('/\?/', function() use ($values, &$i) {
                     $value = $values[$i] ?? '';
                     $i++;
