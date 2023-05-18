@@ -92,13 +92,13 @@ class StatementHandlerTest extends TestCase
             'sql' => "SELECT * FROM `some_table` WHERE `someCoumn` = :first and `someOtherColumn` = :second",
             'lobParams' => [],
             'positionalParams' => [],
-            'namedParams' => ['first' => 'first value has a ? inside it', 'second' => 'second value']
+            'namedParams' => ['first' => 'first value has :second inside it', 'second' => 'second value']
         ]);
 
         $logMessages = $this->db->getLogMessages();
         self::assertCount(3, $logMessages);
         self::assertEquals(
-            "SELECT * FROM `some_table` WHERE `someCoumn` = 'first value has a ? inside it' and `someOtherColumn` = 'second value'",
+            "SELECT * FROM `some_table` WHERE `someCoumn` = 'first value has :second inside it' and `someOtherColumn` = 'second value'",
             $logMessages[2],
             var_export($logMessages, true)
         );
