@@ -300,10 +300,10 @@ class StatementHandler
             if ($this->logQueryValues) {
                 $i = 0;
                 $values = $this->lobParams;
-                return preg_replace_callback('/\?/', function() use ($values, &$i) {
-                    $value = "'$values[$i]'" ?? '';
+                $sql = preg_replace_callback('/\?/', function() use ($values, &$i) {
+                    $value = $values[$i] ?? '';
                     $i++;
-                    return $value;
+                    return "'$value'";
                 }, $sql);
             }
             $this->db->setLogMessage($sql);
