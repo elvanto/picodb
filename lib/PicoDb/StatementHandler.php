@@ -55,6 +55,14 @@ class StatementHandler
     protected $logQueries = false;
 
     /**
+     * Flag to combine values in the logged SQL queries.
+     *
+     * @access protected
+     * @var boolean
+     */
+    protected $logQueryValues = false;
+
+    /**
      * Run explain command on each query
      *
      * @access protected
@@ -125,10 +133,12 @@ class StatementHandler
      * Enable query logging
      *
      * @access public
+     * @param bool $includeValues
      * @return $this
      */
-    public function withLogging()
+    public function withLogging(bool $includeValues = false)
     {
+        $this->logQueryValues = $includeValues;
         $this->logQueries = true;
         return $this;
     }
@@ -229,6 +239,7 @@ class StatementHandler
      *
      * @access public
      * @return PDOStatement|false
+     * @throws SQLException
      */
     public function execute()
     {
@@ -285,7 +296,26 @@ class StatementHandler
     protected function beforeExecute()
     {
         if ($this->logQueries) {
-            $this->db->setLogMessage($this->sql);
+            $sql = $this->sql;
+            if ($this->logQueryValues) {
+                $params = $this->lobParams ?: $this->positionalParams ?: $this->namedParams;
+
+                if ($this->useNamedParams) {
+                    $sql = preg_replace_callback('/:([a-zA-Z0-9_]+)/', function ($matches) use ($params) {
+                        $paramName = $matches[1];
+                        $replacement = $params[$paramName] ?? $matches[0];
+                        return "'$replacement'";
+                    }, $sql);
+                } else {
+                    $i = 0;
+                    $sql = preg_replace_callback('/\?/', function($matches) use ($params, &$i) {
+                        $replacement = $params[$i] ?? '';
+                        $i++;
+                        return "'$replacement'";
+                    }, $sql);
+                }
+            }
+            $this->db->setLogMessage($sql);
         }
 
         if ($this->stopwatch) {
@@ -335,7 +365,6 @@ class StatementHandler
      *
      * @access public
      * @param  PDOException $e
-     * @return bool
      * @throws SQLException
      */
     public function handleSqlError(PDOException $e)
