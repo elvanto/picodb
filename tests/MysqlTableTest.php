@@ -91,14 +91,14 @@ class MysqlTableTest extends \PHPUnit\Framework\TestCase
 
     public function testLimit()
     {
-        $this->assertEquals('SELECT * FROM `test`       LIMIT 10', $this->db->table('test')->limit(10)->buildSelectQuery());
+        $this->assertEquals('SELECT * FROM `test`       FETCH NEXT 10 ROWS', $this->db->table('test')->limit(10)->buildSelectQuery());
         $this->assertEquals('SELECT * FROM `test`', $this->db->table('test')->limit(null)->buildSelectQuery());
     }
 
     public function testOffset()
     {
-        $this->assertEquals('SELECT * FROM `test`        OFFSET 0', $this->db->table('test')->offset(0)->buildSelectQuery());
-        $this->assertEquals('SELECT * FROM `test`        OFFSET 10', $this->db->table('test')->offset(10)->buildSelectQuery());
+        $this->assertEquals('SELECT * FROM `test`        OFFSET 0 ROWS', $this->db->table('test')->offset(0)->buildSelectQuery());
+        $this->assertEquals('SELECT * FROM `test`        OFFSET 10 ROWS', $this->db->table('test')->offset(10)->buildSelectQuery());
         $this->assertEquals('SELECT * FROM `test`', $this->db->table('test')->limit(null)->buildSelectQuery());
     }
 

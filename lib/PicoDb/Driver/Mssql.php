@@ -175,4 +175,26 @@ class Mssql extends Base
         $this->getConnection()->exec('SET SHOWPLAN_ALL ON');
         return $this->getConnection()->query($this->getSqlFromPreparedStatement($sql, $values))->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    /**
+     * Get offset limit clause
+     *
+     * @param int $limit
+     * @param int $offset
+     * @return string
+     */
+    public function getLimitClause($limit, int $offset)
+    {
+        $clause = '';
+
+        if (! is_null($limit)) {
+            $clause .= ' FETCH NEXT '.$limit.' ROWS ONLY';
+        }
+
+        if (! is_null($offset)) {
+            $clause = ' OFFSET '.$offset.' ROWS';
+        }
+
+        return $clause;
+    }
 }

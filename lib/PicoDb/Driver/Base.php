@@ -152,6 +152,28 @@ abstract class Base
     }
 
     /**
+     * Get offset limit clause
+     *
+     * @param int $limit
+     * @param int $offset
+     * @return string
+     */
+    public function getLimitClause($limit, $offset)
+    {
+        $clause = '';
+
+        if (! is_null($limit)) {
+            $clause .= ' LIMIT ' . $limit;
+        }
+
+        if (! is_null($offset)) {
+            $clause .= '  OFFSET ' . $offset;
+        }
+
+        return $clause;
+    }
+
+    /**
      * Upsert for a key/value variable
      *
      * @access public
