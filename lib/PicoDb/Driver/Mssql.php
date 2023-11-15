@@ -183,7 +183,7 @@ class Mssql extends Base
      * @param int $offset
      * @return string
      */
-    public function getLimitClause($limit, int $offset)
+    public function getLimitClause($limit, $offset)
     {
         $clause = '';
 
