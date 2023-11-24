@@ -187,12 +187,12 @@ class Mssql extends Base
     {
         $clause = '';
 
-        if (! is_null($limit)) {
-            $clause .= ' FETCH NEXT '.$limit.' ROWS ONLY';
-        }
-
         if (! is_null($offset)) {
             $clause = ' OFFSET '.$offset.' ROWS';
+        }
+
+        if (! is_null($limit)) {
+            $clause .= ' FETCH NEXT '.$limit.' ROWS ONLY';
         }
 
         return $clause;
