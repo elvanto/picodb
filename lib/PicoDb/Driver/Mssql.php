@@ -135,7 +135,7 @@ class Mssql extends Base
      */
     public function getSchemaVersion()
     {
-        $this->pdo->exec("IF (SELECT [object_id] FROM [sys].[tables] WHERE [object_id] = OBJECT_ID('".$this->schemaTable."')) IS NULL CREATE TABLE [".$this->schemaTable."] ([version] INT DEFAULT '0')");
+        $this->pdo->exec("IF (OBJECT_ID('".$this->schemaTable."')) IS NULL CREATE TABLE [".$this->schemaTable."] ([version] INT DEFAULT '0')");
 
         $rq = $this->pdo->prepare('SELECT [version] FROM ['.$this->schemaTable.']');
         $rq->execute();
