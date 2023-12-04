@@ -105,17 +105,17 @@ class Table
      * SQL limit
      *
      * @access private
-     * @var    string
+     * @var    int
      */
-    private $sqlLimit = '';
+    private $sqlLimit = null;
 
     /**
      * SQL offset
      *
      * @access private
-     * @var    string
+     * @var    int
      */
-    private $sqlOffset = '';
+    private $sqlOffset = null;
 
     /**
      * SQL order
@@ -398,15 +398,17 @@ class Table
     public function exists()
     {
         $sql = sprintf(
-            'SELECT 1 FROM %s %s %s %s %s %s %s %s',
+            'SELECT 1 FROM %s %s %s %s %s %s %s',
             $this->db->escapeIdentifier($this->name),
             implode(' ', $this->joins),
             $this->conditionBuilder->build(),
             empty($this->groupBy) ? '' : 'GROUP BY '.implode(', ', $this->groupBy),
             $this->aggregatedConditionBuilder->build(),
             $this->sqlOrder,
-            $this->sqlLimit,
-            $this->sqlOffset
+            $this->db->getDriver()->getLimitClause(
+                $this->sqlLimit,
+                $this->sqlOffset
+            )
         );
 
         $rq = $this->db->execute($sql,  $this->getValues());
@@ -430,15 +432,17 @@ class Table
 
 
         $sql = sprintf(
-            'SELECT COUNT(' . $column . ') FROM %s %s %s %s %s %s %s %s',
+            'SELECT COUNT(' . $column . ') FROM %s %s %s %s %s %s %s',
             $this->db->escapeIdentifier($this->name),
             implode(' ', $this->joins),
             $this->conditionBuilder->build(),
             empty($this->groupBy) ? '' : 'GROUP BY '.implode(', ', $this->groupBy),
             $this->aggregatedConditionBuilder->build(),
             $this->sqlOrder,
-            $this->sqlLimit,
-            $this->sqlOffset
+            $this->db->getDriver()->getLimitClause(
+                $this->sqlLimit,
+                $this->sqlOffset
+            )
         );
 
         $rq = $this->db->execute($sql,  $this->getValues());
@@ -457,7 +461,7 @@ class Table
     public function sum(string $column)
     {
         $sql = sprintf(
-            'SELECT SUM(%s) FROM %s %s %s %s %s %s %s %s',
+            'SELECT SUM(%s) FROM %s %s %s %s %s %s %s',
             $column,
             $this->db->escapeIdentifier($this->name),
             implode(' ', $this->joins),
@@ -465,8 +469,10 @@ class Table
             empty($this->groupBy) ? '' : 'GROUP BY '.implode(', ', $this->groupBy),
             $this->aggregatedConditionBuilder->build(),
             $this->sqlOrder,
-            $this->sqlLimit,
-            $this->sqlOffset
+            $this->db->getDriver()->getLimitClause(
+                $this->sqlLimit,
+                $this->sqlOffset
+            )
         );
 
         $rq = $this->db->execute($sql, $this->getValues());
@@ -705,7 +711,7 @@ class Table
     public function limit($value)
     {
         if (! is_null($value)) {
-            $this->sqlLimit = ' LIMIT '.(int) $value;
+            $this->sqlLimit = $value;
         }
 
         return $this;
@@ -721,7 +727,7 @@ class Table
     public function offset($value)
     {
         if (! is_null($value)) {
-            $this->sqlOffset = ' OFFSET '.(int) $value;
+            $this->sqlOffset = $value;
         }
 
         return $this;
@@ -820,7 +826,7 @@ class Table
         $this->groupBy = $this->db->escapeIdentifierList($this->groupBy);
 
         return trim(sprintf(
-            'SELECT %s FROM %s %s %s %s %s %s %s %s',
+            'SELECT %s FROM %s %s %s %s %s %s %s',
             $this->sqlSelect,
             $this->db->escapeIdentifier($this->name),
             implode(' ', $this->joins),
@@ -828,8 +834,10 @@ class Table
             empty($this->groupBy) ? '' : 'GROUP BY '.implode(', ', $this->groupBy),
             $this->aggregatedConditionBuilder->build(),
             $this->sqlOrder,
-            $this->sqlLimit,
-            $this->sqlOffset
+            $this->db->getDriver()->getLimitClause(
+                $this->sqlLimit,
+                $this->sqlOffset
+            )
         ));
     }
 
