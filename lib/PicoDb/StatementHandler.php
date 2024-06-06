@@ -321,6 +321,8 @@ class StatementHandler
         if ($this->stopwatch) {
             $this->startTime = microtime(true);
         }
+
+        $this->db->dispatch('beforeExecute', ['sql' => $this->sql]);
     }
 
     /**
@@ -343,6 +345,8 @@ class StatementHandler
 
         $this->nbQueries++;
         $this->cleanup();
+
+        $this->db->dispatch('afterExecute');
     }
 
     /**

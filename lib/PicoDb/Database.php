@@ -51,6 +51,13 @@ class Database
     private $driver;
 
     /**
+     * Event listeners
+     *
+     * @var array
+     */
+    private $listeners = [];
+
+    /**
      * Initialize the driver
      *
      * @access public
@@ -375,5 +382,31 @@ class Database
         }
 
         return $schema;
+    }
+
+    /**
+     * Register an event listener
+     *
+     * @param string   $event
+     * @param callable $cb
+     * @return void
+     */
+    public function listen(string $event, callable $cb)
+    {
+        $this->listeners[$event][] = $cb;
+    }
+
+    /**
+     * Dispatches an event to registered listeners
+     *
+     * @param string $event
+     * @param array  $data
+     * @return void
+     */
+    public function dispatch(string $event, array $data = [])
+    {
+        foreach ($this->listeners[$event] ?? [] as $listener) {
+            call_user_func($listener, $data);
+        }
     }
 }
