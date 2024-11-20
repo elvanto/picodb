@@ -372,7 +372,7 @@ class SqliteTableTest extends \PHPUnit\Framework\TestCase
     {
         $table = $this->db->table('test');
 
-        $this->assertEquals('SELECT * FROM `test`   WHERE NOT (`a` = ? AND `b` = ?)', $table->beginNot()->eq('a', 1)->eq('b', 2)->closeNot()->buildSelectQuery());
+        $this->assertEquals('SELECT * FROM `test`   WHERE NOT ("a" = ? AND "b" = ?)', $table->beginNot()->eq('a', 1)->eq('b', 2)->closeNot()->buildSelectQuery());
         $this->assertEquals(array(2), $table->getConditionBuilder()->getValues());
     }
 
@@ -380,7 +380,7 @@ class SqliteTableTest extends \PHPUnit\Framework\TestCase
     {
         $table = $this->db->table('test');
 
-        $this->assertEquals('SELECT * FROM `test`   WHERE NOT (`a` = ? OR `b` = ?)', $table->beginNot()->beginOr()->eq('a', 1)->eq('b', 2)->closeOr()->closeNot()->buildSelectQuery());
+        $this->assertEquals('SELECT * FROM `test`   WHERE NOT ("a" = ? OR "b" = ?)', $table->beginNot()->beginOr()->eq('a', 1)->eq('b', 2)->closeOr()->closeNot()->buildSelectQuery());
         $this->assertEquals(array(2), $table->getConditionBuilder()->getValues());
     }
 
