@@ -323,6 +323,14 @@ class MysqlTableTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(array(4), $table->getConditionBuilder()->getValues());
     }
 
+    public function testNotConditions()
+    {
+        $table = $this->db->table('test');
+
+        $this->assertEquals('SELECT * FROM `test`   WHERE NOT (`a` IS NOT NULL OR `b` = ?)', $table->beginNot()->notNull('a')->orEq('b', 2)->closeNot()->buildSelectQuery());
+        $this->assertEquals(array(2), $table->getConditionBuilder()->getValues());
+    }
+
     public function testAndConditions()
     {
         $table = $this->db->table('test');
@@ -336,6 +344,14 @@ class MysqlTableTest extends \PHPUnit\Framework\TestCase
         $table = $this->db->table('test');
 
         $this->assertEquals('SELECT * FROM `test`   WHERE `a` IS NOT NULL AND (`b` = ? OR `c` >= ?)', $table->notNull('a')->beginOr()->eq('b', 2)->gte('c', 5)->closeOr()->buildSelectQuery());
+        $this->assertEquals(array(2, 5), $table->getConditionBuilder()->getValues());
+    }
+
+    public function testXorConditions()
+    {
+        $table = $this->db->table('test');
+
+        $this->assertEquals('SELECT * FROM `test`   WHERE `a` IS NOT NULL AND (`b` = ? XOR `c` >= ?)', $table->notNull('a')->beginXor()->eq('b', 2)->gte('c', 5)->closeXor()->buildSelectQuery());
         $this->assertEquals(array(2, 5), $table->getConditionBuilder()->getValues());
     }
 

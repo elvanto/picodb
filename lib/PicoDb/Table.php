@@ -16,10 +16,14 @@ use PicoDb\Builder\UpdateBuilder;
  * @author  Frederic Guillot
  *
  * @method   $this   addCondition($sql)
+ * @method   $this   beginNot()
+ * @method   $this   closeNot()
  * @method   $this   beginAnd()
  * @method   $this   closeAnd()
  * @method   $this   beginOr()
  * @method   $this   closeOr()
+ * @method   $this   beginXor()
+ * @method   $this   closeXor()
  * @method   $this   eq($column, $value)
  * @method   $this   neq($column, $value)
  * @method   $this   in($column, array $values)
