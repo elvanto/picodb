@@ -327,7 +327,7 @@ class MysqlTableTest extends \PHPUnit\Framework\TestCase
     {
         $table = $this->db->table('test');
 
-        $this->assertEquals('SELECT * FROM `test`   WHERE NOT (`a` IS NOT NULL OR `b` = ?)', $table->beginNot()->notNull('a')->orEq('b', 2)->closeNot()->buildSelectQuery());
+        $this->assertEquals('SELECT * FROM `test`   WHERE NOT (`a` = ? OR `b` = ?)', $table->beginNot()->eq('a', 1)->eq('b', 2)->closeNot()->buildSelectQuery());
         $this->assertEquals(array(2), $table->getConditionBuilder()->getValues());
     }
 
