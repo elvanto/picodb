@@ -368,6 +368,13 @@ class SqliteTableTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(array(4), $table->getConditionBuilder()->getValues());
     }
 
+    public function testNotConditions()
+    {
+        $table = $this->db->table('test');
+
+        $this->assertEquals('SELECT * FROM "test"   WHERE NOT ("a" IS NOT NULL)', $table->beginNot()->notNull('a')->closeNot()->buildSelectQuery());
+    }
+
     public function testAndConditions()
     {
         $table = $this->db->table('test');

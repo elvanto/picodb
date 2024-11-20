@@ -322,6 +322,14 @@ class PostgresTableTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(array(4), $table->getConditionBuilder()->getValues());
     }
 
+    public function testNotConditions()
+    {
+        $table = $this->db->table('test');
+
+        $this->assertEquals('SELECT * FROM "test"   WHERE NOT ("a" = ? AND "b" = ?)', $table->beginNot()->eq('a', 2)->eq('b', 4)->closeNot()->buildSelectQuery());
+        $this->assertEquals(array(2, 4), $table->getConditionBuilder()->getValues());
+    }
+
     public function testAndConditions()
     {
         $table = $this->db->table('test');
