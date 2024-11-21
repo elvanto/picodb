@@ -571,8 +571,8 @@ class Table
                 $this->joinValues = array_merge($this->joinValues, $value);
             } else {
                 $where .= ' AND ' . $this->db->escapeIdentifier($alias1) . '.' . $this->db->escapeIdentifier($column) . ' = ?';
+                $this->joinValues[] = $value;
             }
-            $this->joinValues[] = $value;
         }
 
         $this->joins[] = sprintf(
@@ -608,8 +608,8 @@ class Table
                 $this->joinValues = array_merge($this->joinValues, $value);
             } else {
                 $where .= ' AND ' . $this->db->escapeIdentifier($alias1) . '.' . $this->db->escapeIdentifier($column) . ' = ?';
+                $this->joinValues[] = $value;
             }
-            $this->joinValues[] = $value;
         }
 
         $this->joins[] = sprintf(
