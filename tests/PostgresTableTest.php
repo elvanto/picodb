@@ -512,6 +512,11 @@ class PostgresTableTest extends \PHPUnit\Framework\TestCase
             $this->db->table('test2')->columns('a', 'b')->eq('a', 18)->left('test1', 't1', 'foreign_key', 'test2', 'id', ['a' => 18])->findOne()
         );
 
+        $this->assertEquals(
+            array('a' => 18, 'b' => 2),
+            $this->db->table('test2')->columns('a', 'b')->eq('a', 18)->left('test1', 't1', 'foreign_key', 'test2', 'id', ['a' => [18, 19]])->findOne()
+        );
+
         $this->assertNull(
             $this->db->table('test2')->columns('a', 'b')->eq('a', 18)->left('test1', 't1', 'foreign_key', 'test2', 'id', ['a' => 19])->findOne()
         );

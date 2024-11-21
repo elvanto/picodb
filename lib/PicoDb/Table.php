@@ -566,7 +566,12 @@ class Table
     {
         $where = '';
         foreach ($conditions as $column => $value) {
-            $where .= ' AND '.$this->db->escapeIdentifier($alias1).'.'.$this->db->escapeIdentifier($column).' = ?';
+            if (is_array($value)) {
+                $where .= ' AND ' . $this->db->escapeIdentifier($alias1) . '.' . $this->db->escapeIdentifier($column) . ' IN (' . implode(',', array_fill(0, count($value), '?')) . ')';
+                $this->joinValues = array_merge($this->joinValues, $value);
+            } else {
+                $where .= ' AND ' . $this->db->escapeIdentifier($alias1) . '.' . $this->db->escapeIdentifier($column) . ' = ?';
+            }
             $this->joinValues[] = $value;
         }
 
@@ -598,7 +603,12 @@ class Table
     {
         $where = '';
         foreach ($conditions as $column => $value) {
-            $where .= ' AND '.$this->db->escapeIdentifier($alias1).'.'.$this->db->escapeIdentifier($column).' = ?';
+            if (is_array($value)) {
+                $where .= ' AND ' . $this->db->escapeIdentifier($alias1) . '.' . $this->db->escapeIdentifier($column) . ' IN (' . implode(',', array_fill(0, count($value), '?')) . ')';
+                $this->joinValues = array_merge($this->joinValues, $value);
+            } else {
+                $where .= ' AND ' . $this->db->escapeIdentifier($alias1) . '.' . $this->db->escapeIdentifier($column) . ' = ?';
+            }
             $this->joinValues[] = $value;
         }
 
