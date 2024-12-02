@@ -559,16 +559,29 @@ class Table
      * @param  string   $column1
      * @param  string   $table2
      * @param  string   $column2
+     * @param  array    $conditions
      * @return $this
      */
-    public function left($table1, $alias1, $column1, $table2, $column2)
+    public function left($table1, $alias1, $column1, $table2, $column2, $conditions = [])
     {
+        $where = '';
+        foreach ($conditions as $column => $value) {
+            if (is_array($value)) {
+                $where .= ' AND ' . $this->db->escapeIdentifier($alias1) . '.' . $this->db->escapeIdentifier($column) . ' IN (' . implode(',', array_fill(0, count($value), '?')) . ')';
+                $this->joinValues = array_merge($this->joinValues, $value);
+            } else {
+                $where .= ' AND ' . $this->db->escapeIdentifier($alias1) . '.' . $this->db->escapeIdentifier($column) . ' = ?';
+                $this->joinValues[] = $value;
+            }
+        }
+
         $this->joins[] = sprintf(
-            'LEFT JOIN %s AS %s ON %s=%s',
+            'LEFT JOIN %s AS %s ON %s=%s%s',
             $this->db->escapeIdentifier($table1),
             $this->db->escapeIdentifier($alias1),
             $this->db->escapeIdentifier($alias1).'.'.$this->db->escapeIdentifier($column1),
-            $this->db->escapeIdentifier($table2).'.'.$this->db->escapeIdentifier($column2)
+            $this->db->escapeIdentifier($table2).'.'.$this->db->escapeIdentifier($column2),
+            $where
         );
 
         return $this;
@@ -583,16 +596,29 @@ class Table
      * @param  string   $column1
      * @param  string   $table2
      * @param  string   $column2
+     * @param  array    $conditions
      * @return $this
      */
-    public function inner($table1, $alias1, $column1, $table2, $column2)
+    public function inner($table1, $alias1, $column1, $table2, $column2, array $conditions = [])
     {
+        $where = '';
+        foreach ($conditions as $column => $value) {
+            if (is_array($value)) {
+                $where .= ' AND ' . $this->db->escapeIdentifier($alias1) . '.' . $this->db->escapeIdentifier($column) . ' IN (' . implode(',', array_fill(0, count($value), '?')) . ')';
+                $this->joinValues = array_merge($this->joinValues, $value);
+            } else {
+                $where .= ' AND ' . $this->db->escapeIdentifier($alias1) . '.' . $this->db->escapeIdentifier($column) . ' = ?';
+                $this->joinValues[] = $value;
+            }
+        }
+
         $this->joins[] = sprintf(
-            'JOIN %s AS %s ON %s=%s',
+            'JOIN %s AS %s ON %s=%s%s',
             $this->db->escapeIdentifier($table1),
             $this->db->escapeIdentifier($alias1),
             $this->db->escapeIdentifier($alias1).'.'.$this->db->escapeIdentifier($column1),
-            $this->db->escapeIdentifier($table2).'.'.$this->db->escapeIdentifier($column2)
+            $this->db->escapeIdentifier($table2).'.'.$this->db->escapeIdentifier($column2),
+            $where
         );
 
         return $this;

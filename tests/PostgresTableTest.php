@@ -499,6 +499,29 @@ class PostgresTableTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testLeftJoinConditions()
+    {
+        $this->assertNotFalse($this->db->execute('CREATE TABLE test1 (a INTEGER NOT NULL, foreign_key INTEGER NOT NULL)'));
+        $this->assertNotFalse($this->db->execute('CREATE TABLE test2 (id INTEGER NOT NULL, b INTEGER NOT NULL)'));
+
+        $this->assertTrue($this->db->table('test2')->insert(array('id' => 42, 'b' => 2)));
+        $this->assertTrue($this->db->table('test1')->insert(array('a' => 18, 'foreign_key' => 42)));
+
+        $this->assertEquals(
+            array('a' => 18, 'b' => 2),
+            $this->db->table('test2')->columns('a', 'b')->eq('a', 18)->left('test1', 't1', 'foreign_key', 'test2', 'id', ['a' => 18])->findOne()
+        );
+
+        $this->assertEquals(
+            array('a' => 18, 'b' => 2),
+            $this->db->table('test2')->columns('a', 'b')->eq('a', 18)->left('test1', 't1', 'foreign_key', 'test2', 'id', ['a' => [18, 19]])->findOne()
+        );
+
+        $this->assertNull(
+            $this->db->table('test2')->columns('a', 'b')->eq('a', 18)->left('test1', 't1', 'foreign_key', 'test2', 'id', ['a' => 19])->findOne()
+        );
+    }
+
     public function testJoinSubquery()
     {
         $this->assertNotFalse($this->db->execute('CREATE TABLE test1 (id INTEGER NOT NULL, a INTEGER NOT NULL)'));

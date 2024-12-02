@@ -332,7 +332,7 @@ Returns true if a record exists otherwise false.
 $db->table('mytable')->eq('column1', 12)->exists();
 ```
 
-### Left joins
+### Joins
 
 ```php
 // SELECT * FROM mytable LEFT JOIN my_other_table AS t1 ON t1.id=mytable.foreign_key
@@ -345,6 +345,28 @@ or
 // SELECT * FROM mytable LEFT JOIN my_other_table ON my_other_table.id=mytable.foreign_key
 $db->table('mytable')->join('my_other_table', 'id', 'foreign_key')->findAll();
 ```
+
+or
+
+```php
+// SELECT * FROM mytable LEFT JOIN my_other_table AS t1 ON t1.id=mytable.foreign_key
+$db->table('mytable')->inner('my_other_table', 't1', 'id', 'mytable', 'foreign_key')->findAll();
+```
+
+Additional equality conditions can be added to a left or inner join:
+
+```php
+// SELECT * FROM mytable LEFT JOIN my_other_table AS t1 ON t1.id=mytable.foreign_key and t1.status="active"
+$db->table('mytable')->left('my_other_table', 't1', 'id', 'mytable', 'foreign_key', ['status' => 'active'])->findAll();
+```
+
+or
+
+```php
+// SELECT * FROM mytable LEFT JOIN my_other_table AS t1 ON t1.id=mytable.foreign_key and t1.status IN ("archived", "disabled")
+$db->table('mytable')->left('my_other_table', 't1', 'id', 'mytable', 'foreign_key', ['status' => ['archived', 'disabled']])->findAll();
+```
+
 
 ### Equals condition
 
