@@ -53,6 +53,14 @@ class LogicConditionBuilder implements BuilderInterface
      */
     public function build()
     {
+        if ($this->type === 'NOT') {
+            if (count($this->conditions) === 1) {
+                return 'NOT ' . $this->conditions[0];
+            }
+
+            return 'NOT (' . implode(' AND ', $this->conditions) . ')';
+        }
+
         return '('.implode(' '. $this->type .' ', $this->conditions).')';
     }
 }

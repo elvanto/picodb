@@ -450,7 +450,7 @@ $db->table('mytable')
     ->findAll();
 ```
 
-How to make a OR condition:
+How to make an OR condition:
 
 ```php
 $db->table('mytable')
@@ -462,7 +462,31 @@ $db->table('mytable')
     ->findAll();
 ```
 
-Further AND conditions can be embedded within an OR:
+How to make an XOR condition:
+
+```php
+$db->table('mytable')
+    ->beginXor()
+    ->like('column2', '%mytable')
+    ->gte('column1', 3)
+    ->closeXor()
+    ->eq('column5', 'titi')
+    ->findAll();
+```
+
+How to make a NOT condition:
+
+```php
+$db->table('mytable')
+    ->beginNot()
+    ->like('column2', '%mytable')
+    ->gte('column1', 3)
+    ->closeNot()
+    ->eq('column5', 'titi')
+    ->findAll();
+```
+
+Logical conditions can be embedded within other logical conditions:
 
 ```php
 $db->table('mytable')

@@ -38,7 +38,7 @@ class BaseConditionBuilder
     protected $conditions = array();
 
     /**
-     * SQL embedded AND/OR conditions
+     * SQL embedded NOT/AND/OR/XOR conditions
      *
      * @access private
      * @var    LogicConditionBuilder[]
@@ -102,6 +102,24 @@ class BaseConditionBuilder
         }
     }
 
+    public function beginNot()
+    {
+        $this->embeddedConditionOffset++;
+        $this->embeddedConditions[$this->embeddedConditionOffset] = new LogicConditionBuilder('NOT');
+    }
+
+    public function closeNot()
+    {
+        $condition = $this->embeddedConditions[$this->embeddedConditionOffset]->build();
+        $this->embeddedConditionOffset--;
+
+        if ($this->embeddedConditionOffset > 0) {
+            $this->embeddedConditions[$this->embeddedConditionOffset]->withCondition($condition);
+        } else {
+            $this->conditions[] = $condition;
+        }
+    }
+
     /**
      * Start AND condition
      *
@@ -147,6 +165,34 @@ class BaseConditionBuilder
      * @access public
      */
     public function closeOr()
+    {
+        $condition = $this->embeddedConditions[$this->embeddedConditionOffset]->build();
+        $this->embeddedConditionOffset--;
+
+        if ($this->embeddedConditionOffset > 0) {
+            $this->embeddedConditions[$this->embeddedConditionOffset]->withCondition($condition);
+        } else {
+            $this->conditions[] = $condition;
+        }
+    }
+
+    /**
+     * Start OR condition
+     *
+     * @access public
+     */
+    public function beginXor()
+    {
+        $this->embeddedConditionOffset++;
+        $this->embeddedConditions[$this->embeddedConditionOffset] = new LogicConditionBuilder('XOR');
+    }
+
+    /**
+     * Close OR condition
+     *
+     * @access public
+     */
+    public function closeXor()
     {
         $condition = $this->embeddedConditions[$this->embeddedConditionOffset]->build();
         $this->embeddedConditionOffset--;
