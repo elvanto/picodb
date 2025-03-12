@@ -646,8 +646,7 @@ class Table
 
         $this->joinValues = array_merge(
             $this->joinValues,
-            $subQuery->getConditionBuilder()->getValues(),
-            $subQuery->getAggregatedConditionBuilder()->getValues()
+            $subQuery->getValues()
         );
 
         return $this;
@@ -675,8 +674,7 @@ class Table
 
         $this->joinValues = array_merge(
             $this->joinValues,
-            $subQuery->getConditionBuilder()->getValues(),
-            $subQuery->getAggregatedConditionBuilder()->getValues()
+            $subQuery->getValues()
         );
 
         return $this;
