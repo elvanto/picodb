@@ -2,6 +2,8 @@
 
 # Exit on any error
 set -e
+# print each command being run so we can see what command had an error.
+set -x
 
 # Check for parameters (PHP version and MySQL version)
 if [ "$#" -ne 2 ]; then
@@ -17,9 +19,11 @@ MYSQL_VERSION=$2
 PHP_CONTAINER_NAME="php-test-container"
 MYSQL_CONTAINER_NAME="mysql-test-container"
 
-# Pull the necessary Docker images
-docker pull php:$PHP_VERSION-cli
-docker pull mysql:$MYSQL_VERSION
+# Pull the necessary Docker images, forcing ARM64 if required.
+
+# Pulling images.                   # Fallback to amd64 when no arm64 image exists.
+docker pull php:$PHP_VERSION-cli || docker pull --platform linux/amd64 php:$PHP_VERSION-cli
+docker pull mysql:$MYSQL_VERSION || docker pull --platform linux/amd64 mysql:$MYSQL_VERSION
 
 # Run MySQL container
 docker run --name $MYSQL_CONTAINER_NAME -d \
@@ -32,7 +36,7 @@ docker run --name $MYSQL_CONTAINER_NAME -d \
 echo "Waiting for MySQL to start..."
 sleep 20 # Wait for MySQL to be ready, you can adjust this based on your setup
 
-# Run PHP container
+# Run unit tests inside php container...
 docker run --name $PHP_CONTAINER_NAME --rm -d \
   --link $MYSQL_CONTAINER_NAME:mysql \
   -v $(pwd):/app \
@@ -49,7 +53,6 @@ echo "Test run complete. Cleaning up..."
 docker stop $MYSQL_CONTAINER_NAME
 docker rm $MYSQL_CONTAINER_NAME
 
-# Remove PHP container (it’s already removed after running since we used --rm)
-docker stop $PHP_CONTAINER_NAME
+# PHP container should automatically stopped and removed itself.
 
 echo "Finished running tests for PHP $PHP_VERSION and MySQL $MYSQL_VERSION"
