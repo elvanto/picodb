@@ -12,7 +12,9 @@ class StatementHandlerTest extends TestCase
      */
     private $db;
 
-    protected function setUp()
+    private $statementHandler;
+
+    protected function setUp(): void
     {
         $this->db = new Database(array('driver' => 'sqlite', 'filename' => ':memory:'));
         $this->statementHandler = new StatementHandler($this->db);

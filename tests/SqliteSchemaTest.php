@@ -8,7 +8,7 @@ class SqliteSchemaTest extends \PHPUnit\Framework\TestCase
      */
     private $db;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->db = new PicoDb\Database(array('driver' => 'sqlite', 'filename' => ':memory:'));
     }

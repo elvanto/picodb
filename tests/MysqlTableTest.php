@@ -10,12 +10,13 @@ class MysqlTableTest extends \PHPUnit\Framework\TestCase
      */
     private $db;
 
-    public function setUp()
+    public function setUp(): void
     {
-        $this->db = new Database(array('driver' => 'mysql', 'hostname' => '127.0.0.1', 'username' => 'root', 'password' => 'rootpassword', 'database' => 'picodb'));
+        $this->db = new Database(array('driver' => 'mysql', 'hostname' => getenv('MYSQL_HOST'), 'username' => 'root', 'password' => 'rootpassword', 'database' => 'picodb'));
         $this->db->getConnection()->exec('CREATE DATABASE IF NOT EXISTS `picodb`');
         $this->db->getConnection()->exec('DROP TABLE IF EXISTS test1');
         $this->db->getConnection()->exec('DROP TABLE IF EXISTS test2');
+        $this->db->getConnection()->exec('DROP TABLE IF EXISTS foo');
         $this->db->getConnection()->exec('DROP TABLE IF EXISTS foobar');
         $this->db->getConnection()->exec('DROP TABLE IF EXISTS foobar_persist');
         $this->db->getConnection()->exec('DROP TABLE IF EXISTS schema_version');

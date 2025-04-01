@@ -9,16 +9,15 @@ class SqliteDriverTest extends \PHPUnit\Framework\TestCase
      */
     private $driver;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->driver = new Sqlite(array('filename' => ':memory:'));
     }
 
-    /**
-     * @expectedException LogicException
-     */
     public function testMissingRequiredParameter()
     {
+        $this->expectException(LogicException::class);
+
         new Sqlite(array());
     }
 

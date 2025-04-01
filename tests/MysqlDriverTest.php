@@ -9,19 +9,18 @@ class MysqlDriverTest extends \PHPUnit\Framework\TestCase
      */
     private $driver;
 
-    public function setUp()
+    public function setUp(): void
     {
-        $this->driver = new Mysql(array('hostname' => '127.0.0.1', 'username' => 'root', 'password' => 'rootpassword', 'database' => 'picodb'));
+        $this->driver = new Mysql(array('hostname' => getenv('MYSQL_HOST'), 'username' => 'root', 'password' => 'rootpassword', 'database' => 'picodb'));
         $this->driver->getConnection()->exec('CREATE DATABASE IF NOT EXISTS `picodb`');
         $this->driver->getConnection()->exec('DROP TABLE IF EXISTS foobar');
         $this->driver->getConnection()->exec('DROP TABLE IF EXISTS schema_version');
     }
 
-    /**
-     * @expectedException LogicException
-     */
     public function testMissingRequiredParameter()
     {
+        $this->expectException(LogicException::class);
+
         new Mysql(array());
     }
 

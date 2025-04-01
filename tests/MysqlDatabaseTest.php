@@ -9,9 +9,9 @@ class MysqlDatabaseTest extends \PHPUnit\Framework\TestCase
      */
     private $db;
 
-    public function setUp()
+    public function setUp(): void
     {
-        $this->db = new Database(array('driver' => 'mysql', 'hostname' => '127.0.0.1', 'username' => 'root', 'password' => 'rootpassword', 'database' => 'picodb'));
+        $this->db = new Database(array('driver' => 'mysql', 'hostname' => getenv('MYSQL_HOST'), 'username' => 'root', 'password' => 'rootpassword', 'database' => 'picodb'));
         $this->db->getConnection()->exec('CREATE DATABASE IF NOT EXISTS `picodb`');
         $this->db->getConnection()->exec('DROP TABLE IF EXISTS foobar');
         $this->db->getConnection()->exec('DROP TABLE IF EXISTS schema_version');
@@ -41,11 +41,10 @@ class MysqlDatabaseTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('a', $this->db->execute('SELECT something FROM foobar WHERE something=?', array('a'))->fetchColumn());
     }
 
-    /**
-     * @expectedException PicoDb\SQLException
-     */
     public function testBadSQLQuery()
     {
+        $this->expectException(\PicoDb\SQLException::class);
+
         $this->db->execute('INSERT INTO foobar');
     }
 
@@ -77,11 +76,10 @@ class MysqlDatabaseTest extends \PHPUnit\Framework\TestCase
         }));
     }
 
-    /**
-     * @expectedException PicoDb\SQLException
-     */
     public function testThatTransactionThrowExceptionWhenRollbacked()
     {
+        $this->expectException(\PicoDb\SQLException::class);
+
         $this->assertFalse($this->db->transaction(function (Database $db) {
             $db->getConnection()->exec('CREATE TABL');
         }));
