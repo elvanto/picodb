@@ -81,6 +81,9 @@ jobs:
       matrix:
         php-versions: [ '8.0', '8.1', '8.2', '8.3', '8.4' ]
     name: PHP ${{ matrix.php-versions }} with MySQL 8.0 & Postgres 11
+    env:
+      MYSQL_HOST: 127.0.0.1
+      POSTGRES_HOST: 127.0.0.1
 
     services:
       mysql:

@@ -40,7 +40,7 @@ class MysqlLobTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($result);
 
         $contents = $this->db->largeObject('large_objects')->eq('id', 'test')->findOneColumnAsStream('file_content');
-        $this->assertSame(md5(file_get_contents(__FILE__)), md5(stream_get_contents($contents)));
+        $this->assertSame(md5(file_get_contents(__FILE__)), md5(is_string($contents) ? $contents : stream_get_contents($contents)));
     }
 
     public function testFindOneColumnAsString()
