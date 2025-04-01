@@ -25,6 +25,8 @@
         "phpunit/phpunit": "^9.6"
     },
     "scripts": {
-        "test": "phpunit tests"
+        "docker:start": "docker compose up -d",
+        "docker:stop": "docker compose down",
+        "test": "docker compose run --rm php /app/vendor/bin/phpunit /app/tests"
     }
 }
