@@ -9,23 +9,23 @@ class PostgresDriverTest extends \PHPUnit\Framework\TestCase
      */
     private $driver;
 
-    public function setUp()
+    public function setUp(): void
     {
-        $this->driver = new Postgres(array('hostname' => '127.0.0.1', 'username' => 'root', 'password' => 'rootpassword', 'database' => 'picodb'));
+        $this->driver = new Postgres(array('hostname' => getenv('POSTGRES_HOST'), 'username' => 'root', 'password' => 'rootpassword', 'database' => 'picodb'));
+        $this->driver->getConnection()->exec('DROP TABLE IF EXISTS foo');
         $this->driver->getConnection()->exec('DROP TABLE IF EXISTS foobar');
         $this->driver->getConnection()->exec('DROP TABLE IF EXISTS schema_version');
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->driver->closeConnection();
     }
 
-    /**
-     * @expectedException LogicException
-     */
     public function testMissingRequiredParameter()
     {
+        $this->expectException(LogicException::class);
+
         new Postgres(array());
     }
 

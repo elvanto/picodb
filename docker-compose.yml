@@ -1,0 +1,29 @@
+services:
+  php:
+    build: docker/php
+    command: /app/vendor/bin/phpunit /app/tests
+    volumes:
+      - .:/app
+    links:
+      - mysql
+      - postgres
+    environment:
+      - MYSQL_HOST=mysql
+      - POSTGRES_HOST=postgres
+  mysql:
+    image: mysql:8.0-oracle
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: picodb
+      MYSQL_USER: test
+      MYSQL_PASSWORD: test
+    ports:
+      - "3306:3306"
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: rootpassword
+      POSTGRES_DB: picodb
+    ports:
+      - "5432:5432"

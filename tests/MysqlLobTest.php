@@ -7,9 +7,9 @@ class MysqlLobTest extends \PHPUnit\Framework\TestCase
      */
     private $db;
 
-    public function setUp()
+    public function setUp(): void
     {
-        $this->db = new PicoDb\Database(array('driver' => 'mysql', 'hostname' => '127.0.0.1', 'username' => 'root', 'password' => 'rootpassword', 'database' => 'picodb'));
+        $this->db = new PicoDb\Database(array('driver' => 'mysql', 'hostname' => getenv('MYSQL_HOST'), 'username' => 'root', 'password' => 'rootpassword', 'database' => 'picodb'));
         $this->db->getConnection()->exec('DROP TABLE IF EXISTS large_objects');
         $this->db->getConnection()->exec('CREATE TABLE large_objects (id VARCHAR(20), file_content BLOB)');
         $this->db->getStatementHandler()->withLogging();
@@ -40,7 +40,7 @@ class MysqlLobTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($result);
 
         $contents = $this->db->largeObject('large_objects')->eq('id', 'test')->findOneColumnAsStream('file_content');
-        $this->assertSame(md5(file_get_contents(__FILE__)), md5($contents));
+        $this->assertSame(md5(file_get_contents(__FILE__)), md5(is_string($contents) ? $contents : stream_get_contents($contents)));
     }
 
     public function testFindOneColumnAsString()

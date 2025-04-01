@@ -9,7 +9,7 @@ class SqliteDatabaseTest extends \PHPUnit\Framework\TestCase
      */
     private $db;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->db = new Database(array('driver' => 'sqlite', 'filename' => ':memory:'));
     }
@@ -38,11 +38,10 @@ class SqliteDatabaseTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('a', $this->db->execute('SELECT something FROM foobar WHERE something=?', array('a'))->fetchColumn());
     }
 
-    /**
-     * @expectedException PicoDb\SQLException
-     */
     public function testBadSQLQuery()
     {
+        $this->expectException(\PicoDb\SQLException::class);
+
         $this->db->execute('INSERT INTO foobar');
     }
 
@@ -74,11 +73,10 @@ class SqliteDatabaseTest extends \PHPUnit\Framework\TestCase
         }));
     }
 
-    /**
-     * @expectedException PicoDb\SQLException
-     */
     public function testThatTransactionThrowExceptionWhenRollbacked()
     {
+        $this->expectException(\PicoDb\SQLException::class);
+
         $this->assertFalse($this->db->transaction(function (Database $db) {
             $db->getConnection()->exec('CREATE TABL');
         }));
@@ -110,11 +108,10 @@ class SqliteDatabaseTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($instance1 === $instance2);
     }
 
-    /**
-     * @expectedException LogicException
-     */
     public function testGetMissingInstance()
     {
+        $this->expectException(\LogicException::class);
+
         Database::getInstance('notfound');
     }
 }
