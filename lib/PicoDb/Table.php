@@ -894,14 +894,17 @@ class Table
     /**
      * Executes the provided callback if the condition is true
      *
-     * @param  bool    $condition
-     * @param  Closure $callback
+     * @param bool         $condition
+     * @param Closure      $callback
+     * @param Closure|null $default
      * @return $this
      */
-    public function when(bool $condition, Closure $callback)
+    public function when(bool $condition, Closure $callback, ?Closure $default = null)
     {
         if ($condition) {
             $callback($this);
+        } elseif ($default) {
+            $default($this);
         }
         return $this;
     }
