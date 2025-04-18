@@ -892,6 +892,21 @@ class Table
     }
 
     /**
+     * Executes the provided callback if the condition is true
+     *
+     * @param  bool    $condition
+     * @param  Closure $callback
+     * @return $this
+     */
+    public function when(bool $condition, Closure $callback)
+    {
+        if ($condition) {
+            $callback($this);
+        }
+        return $this;
+    }
+
+    /**
      * Magic method for sql conditions
      *
      * @access public
