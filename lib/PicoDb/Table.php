@@ -893,6 +893,7 @@ class Table
 
     /**
      * Executes the provided callback if the condition is true
+     * Otherwise, executes the default callback, if provided
      *
      * @param bool         $condition
      * @param Closure      $callback
