@@ -892,6 +892,25 @@ class Table
     }
 
     /**
+     * Executes the provided callback if the condition is true
+     * Otherwise, executes the default callback, if provided
+     *
+     * @param bool         $condition
+     * @param Closure      $callback
+     * @param Closure|null $default
+     * @return $this
+     */
+    public function when(bool $condition, Closure $callback, ?Closure $default = null)
+    {
+        if ($condition) {
+            $callback($this);
+        } elseif ($default) {
+            $default($this);
+        }
+        return $this;
+    }
+
+    /**
      * Magic method for sql conditions
      *
      * @access public
