@@ -135,9 +135,10 @@ class PostgresTableTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('SELECT * FROM "test"   WHERE "a" IN (?, ?)', $table->in('a', array('b', 'c'))->buildSelectQuery());
         $this->assertEquals(array('b', 'c'), $table->getConditionBuilder()->getValues());
 
-        $this->expectException(\InvalidArgumentException::class);
         $table = $this->db->table('test');
-        $table->in('a', array());
+
+        $this->assertEquals('SELECT * FROM "test"   WHERE 0 = 1', $table->in('a', array())->buildSelectQuery());
+        $this->assertEquals(array(), $table->getConditionBuilder()->getValues());
     }
 
     public function testConditionInSubquery()
