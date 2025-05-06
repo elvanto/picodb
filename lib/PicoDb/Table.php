@@ -851,7 +851,7 @@ class Table
             $this->sqlSelect = ($this->distinct ? 'DISTINCT ' : '').(empty($this->columns) ? '*' : implode(', ', $this->columns));
         }
 
-        $this->groupBy = $this->db->escapeIdentifierList($this->groupBy);
+        $groupBy = $this->db->escapeIdentifierList($this->groupBy);
 
         return trim(sprintf(
             'SELECT %s FROM %s %s %s %s %s %s %s',
@@ -859,7 +859,7 @@ class Table
             $this->db->escapeIdentifier($this->name),
             implode(' ', $this->joins),
             $this->conditionBuilder->build(),
-            empty($this->groupBy) ? '' : 'GROUP BY '.implode(', ', $this->groupBy),
+            empty($groupBy) ? '' : 'GROUP BY '.implode(', ', $groupBy),
             $this->aggregatedConditionBuilder->build(),
             $this->sqlOrder,
             $this->db->getDriver()->getLimitClause(
