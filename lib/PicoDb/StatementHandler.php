@@ -279,12 +279,36 @@ class StatementHandler
         }
 
         foreach ($this->positionalParams as $value) {
-            $pdoStatement->bindValue($i, $value, PDO::PARAM_STR);
+            switch (true) {
+                case is_numeric($value):
+                    $pdoStatement->bindValue($i, $value, PDO::PARAM_INT);
+                    break;
+                case is_bool($value):
+                    $pdoStatement->bindValue($i, $value, PDO::PARAM_BOOL);
+                    break;
+                case $value === null:
+                    $pdoStatement->bindValue($i, $value, PDO::PARAM_NULL);
+                    break;
+                default:
+                    $pdoStatement->bindValue($i, $value, PDO::PARAM_STR);
+            }
             $i++;
         }
 
         foreach ($this->namedParams as $name => $value) {
-            $pdoStatement->bindValue($name, $value, PDO::PARAM_STR);
+            switch (true) {
+                case is_numeric($value):
+                    $pdoStatement->bindValue($name, $value, PDO::PARAM_INT);
+                    break;
+                case is_bool($value):
+                    $pdoStatement->bindValue($name, $value, PDO::PARAM_BOOL);
+                    break;
+                case $value === null:
+                    $pdoStatement->bindValue($i, $value, PDO::PARAM_NULL);
+                    break;
+                default:
+                    $pdoStatement->bindValue($name, $value, PDO::PARAM_STR);
+            }
         }
     }
 
