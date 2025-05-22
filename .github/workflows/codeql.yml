@@ -12,7 +12,7 @@ jobs:
   analyze:
     strategy:
       matrix:
-        php-versions: [ '8.2' ]
+        php-versions: [ '8.0' ]
     name: Analyze PHP ${{ matrix.php-versions }}
     uses: tithely/php-workflows/.github/workflows/codeql.yml@main
     with:
