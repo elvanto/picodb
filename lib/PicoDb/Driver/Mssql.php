@@ -46,6 +46,9 @@ class Mssql extends Base
         if (! empty($settings['port'])) {
             $dsn .= ';port=' . $settings['port'];
         }
+        if (is_bool($settings['trust_server_cert'] ?? null)) {
+            $dsn .= ';TrustServerCertificate=' . ($settings['trust_server_cert'] ? 'true' : 'false');
+        }
 
         $this->pdo = new PDO($dsn, $settings['username'], $settings['password']);
 
