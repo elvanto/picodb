@@ -103,6 +103,14 @@ class StatementHandler
     protected $namedParams = array();
 
     /**
+     * Output SQL parameters
+     *
+     * @access protected
+     * @var array
+     */
+    protected $outputParams = array();
+
+    /**
      * Flag to use named params
      *
      * @access protected
@@ -208,6 +216,20 @@ class StatementHandler
     }
 
     /**
+     * Set output parameters
+     *
+     * @access public
+     * @param  array $params
+     * @return $this
+     */
+    public function withOutputParams(array &$params)
+    {
+        $this->outputParams = $params;
+        $this->useNamedParams = true;
+        return $this;
+    }
+
+    /**
      * Bind large object parameter
      *
      * @access public
@@ -217,7 +239,7 @@ class StatementHandler
      */
     public function withLobParam($name, &$fp)
     {
-        $this->lobParams[$name] =& $fp;
+        $this->lobParams[$name] = &$fp;
         return $this;
     }
 
@@ -286,6 +308,10 @@ class StatementHandler
         foreach ($this->namedParams as $name => $value) {
             $pdoStatement->bindValue($name, $value, PDO::PARAM_STR);
         }
+
+        foreach ($this->outputParams as $name => &$value) {
+            $pdoStatement->bindParam($name, $value, PDO::PARAM_STR | PDO::PARAM_INPUT_OUTPUT, 2048);
+        }
     }
 
     /**
@@ -308,7 +334,7 @@ class StatementHandler
                     }, $sql);
                 } else {
                     $i = 0;
-                    $sql = preg_replace_callback('/\?/', function($matches) use ($params, &$i) {
+                    $sql = preg_replace_callback('/\?/', function ($matches) use ($params, &$i) {
                         $replacement = $params[$i] ?? '';
                         $i++;
                         return "'$replacement'";
@@ -333,8 +359,8 @@ class StatementHandler
         if ($this->stopwatch) {
             $duration = microtime(true) - $this->startTime;
             $this->executionTime += $duration;
-            $this->db->setLogMessage('query_duration='.$duration);
-            $this->db->setLogMessage('total_execution_time='.$this->executionTime);
+            $this->db->setLogMessage('query_duration=' . $duration);
+            $this->db->setLogMessage('total_execution_time=' . $this->executionTime);
         }
 
         if ($this->explain) {
@@ -373,6 +399,6 @@ class StatementHandler
         $this->db->cancelTransaction();
         $this->db->setLogMessage($e->getMessage());
 
-        throw new SQLException('SQL Error: '.$e->getMessage());
+        throw new SQLException('SQL Error: ' . $e->getMessage());
     }
 }
