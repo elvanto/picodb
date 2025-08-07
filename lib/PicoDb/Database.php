@@ -299,6 +299,17 @@ class Database
     }
 
     /**
+     * Checks if inside a transaction
+     *
+     * @access public
+     * @return bool
+     */
+    public function inTransaction()
+    {
+        return $this->getConnection()->inTransaction();
+    }
+
+    /**
      * Begin a transaction
      *
      * @access public
@@ -306,7 +317,7 @@ class Database
      */
     public function startTransaction()
     {
-        if (! $this->getConnection()->inTransaction()) {
+        if (! $this->inTransaction()) {
             return $this->getConnection()->beginTransaction();
         }
 
@@ -321,7 +332,7 @@ class Database
      */
     public function closeTransaction()
     {
-        if ($this->getConnection()->inTransaction()) {
+        if ($this->inTransaction()) {
             return $this->getConnection()->commit();
         }
 
@@ -336,7 +347,7 @@ class Database
      */
     public function cancelTransaction()
     {
-        if ($this->getConnection()->inTransaction()) {
+        if ($this->inTransaction()) {
             return $this->getConnection()->rollBack();
         }
 
