@@ -471,7 +471,7 @@ class MssqlTableTest extends \PHPUnit\Framework\TestCase
             ->eq('status', 0)
             ->inSubquery('foo', $subQuery);
 
-        $this->assertEquals('SELECT * FROM `foobar`   WHERE `status` = ? AND `foo` IN (SELECT foo FROM `foopoints`   GROUP BY `foo`  HAVING SUM(foopoints.points) > ?)', $query->buildSelectQuery());
+        $this->assertEquals('SELECT * FROM [foobar]   WHERE [status] = ? AND [foo] IN (SELECT foo FROM [foopoints]   GROUP BY [foo]  HAVING SUM(foopoints.points) > ?)', $query->buildSelectQuery());
         $this->assertEquals([0, 15], $query->getConditionBuilder()->getValues());
         $this->assertEquals(6, $query->sum('foo'));
 
@@ -562,7 +562,7 @@ class MssqlTableTest extends \PHPUnit\Framework\TestCase
             ->orderBy('id');
 
         $this->assertEquals(
-            'SELECT id, a, b FROM test1 t1 LEFT JOIN (SELECT * FROM [test2]   WHERE [b] = ?) AS [b] ON [b].`foreign_key`=`t1`.`id`     ORDER BY `id` ASC',
+            'SELECT id, a, b FROM test1 t1 LEFT JOIN (SELECT * FROM [test2]   WHERE [b] = ?) AS [b] ON [b].[foreign_key]=[t1].[id]     ORDER BY [id] ASC',
             $query->buildSelectQuery()
         );
 
@@ -618,7 +618,7 @@ class MssqlTableTest extends \PHPUnit\Framework\TestCase
             ->orderBy('id');
 
         $this->assertEquals(
-            'SELECT id, a, b FROM test1 t1 INNER JOIN (SELECT * FROM [test2]   WHERE [b] = ?) AS [b] ON [b].`foreign_key`=`t1`.`id`     ORDER BY `id` ASC',
+            'SELECT id, a, b FROM test1 t1 INNER JOIN (SELECT * FROM [test2]   WHERE [b] = ?) AS [b] ON [b].[foreign_key]=[t1].[id]     ORDER BY [id] ASC',
             $query->buildSelectQuery()
         );
 

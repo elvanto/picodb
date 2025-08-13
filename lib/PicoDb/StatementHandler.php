@@ -384,6 +384,7 @@ class StatementHandler
         $this->positionalParams = array();
         $this->namedParams = array();
         $this->lobParams = array();
+        $this->outputParams = array();
     }
 
     /**
