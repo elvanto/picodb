@@ -8,6 +8,7 @@ use PicoDb\Builder\AggregatedConditionBuilder;
 use PicoDb\Builder\ConditionBuilder;
 use PicoDb\Builder\InsertBuilder;
 use PicoDb\Builder\UpdateBuilder;
+use PicoDb\Driver\Mssql;
 
 /**
  * Table
@@ -852,9 +853,20 @@ class Table
         }
 
         $groupBy = $this->db->escapeIdentifierList($this->groupBy);
+        $selectLimit = '';
+
+        // MSSQL uses SELECT TOP n [columns] instead of LIMIT when OFFSET is not specified
+        if (
+            $this->db->getDriver() instanceof Mssql &&
+            ! is_null($this->sqlLimit) &&
+            is_null($this->sqlOffset)
+        ) {
+            $selectLimit = 'TOP '.$this->sqlLimit.' ';
+        }
 
         return trim(sprintf(
-            'SELECT %s FROM %s %s %s %s %s %s %s',
+            'SELECT %s%s FROM %s %s %s %s %s %s %s',
+            $selectLimit,
             $this->sqlSelect,
             $this->db->escapeIdentifier($this->name),
             implode(' ', $this->joins),
