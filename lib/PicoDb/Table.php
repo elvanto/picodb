@@ -412,7 +412,8 @@ class Table
             $this->sqlOrder,
             $this->db->getDriver()->getLimitClause(
                 $this->sqlLimit,
-                $this->sqlOffset
+                $this->sqlOffset,
+                $this->sqlOrder
             )
         );
 
@@ -446,7 +447,8 @@ class Table
             $this->sqlOrder,
             $this->db->getDriver()->getLimitClause(
                 $this->sqlLimit,
-                $this->sqlOffset
+                $this->sqlOffset,
+                $this->sqlOrder
             )
         );
 
@@ -476,7 +478,8 @@ class Table
             $this->sqlOrder,
             $this->db->getDriver()->getLimitClause(
                 $this->sqlLimit,
-                $this->sqlOffset
+                $this->sqlOffset,
+                $this->sqlOrder
             )
         );
 
@@ -876,7 +879,8 @@ class Table
             $this->sqlOrder,
             $this->db->getDriver()->getLimitClause(
                 $this->sqlLimit,
-                $this->sqlOffset
+                $this->sqlOffset,
+                $this->sqlOrder
             )
         ));
     }
