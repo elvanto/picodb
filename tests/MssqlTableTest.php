@@ -12,7 +12,7 @@ class MssqlTableTest extends \PHPUnit\Framework\TestCase
 
     public function setUp(): void
     {
-        $this->db = new Database(array('driver' => 'mssql', 'hostname' => getenv('MSSQL_HOST'), 'username' => 'root', 'password' => 'rootpassword', 'database' => 'picodb', 'trust_server_cert' => true));
+        $this->db = new Database(array('driver' => 'mssql', 'hostname' => getenv('MSSQL_HOST'), 'username' => 'sa', 'password' => 'r00t_Password', 'database' => 'master', 'trust_server_cert' => true));
         $this->db->getConnection()->exec("IF (SELECT db_id('picodb')) IS NULL CREATE DATABASE [picodb]");
         $this->db->getConnection()->exec('DROP TABLE IF EXISTS test1');
         $this->db->getConnection()->exec('DROP TABLE IF EXISTS test2');
@@ -21,6 +21,7 @@ class MssqlTableTest extends \PHPUnit\Framework\TestCase
         $this->db->getConnection()->exec('DROP TABLE IF EXISTS foobar_persist');
         $this->db->getConnection()->exec('DROP TABLE IF EXISTS schema_version');
     }
+
     public function testSelect()
     {
         $this->assertEquals('SELECT 1 FROM [test]', $this->db->table('test')->select(1)->buildSelectQuery());

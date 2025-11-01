@@ -7,9 +7,11 @@ services:
     links:
       - mysql
       - postgres
+      - sqlserver
     environment:
       - MYSQL_HOST=mysql
       - POSTGRES_HOST=postgres
+      - MSSQL_HOST=sqlserver
   mysql:
     image: mysql:8.0-oracle
     environment:
@@ -27,3 +29,11 @@ services:
       POSTGRES_DB: picodb
     ports:
       - "5432:5432"
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      ACCEPT_EULA: Y
+      MSSQL_PID: Developer
+      MSSQL_SA_PASSWORD: r00t_Password
+    ports:
+      - "1433:1433"
