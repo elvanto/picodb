@@ -258,6 +258,26 @@ class Database
     }
 
     /**
+     * Execute a prepared statement with named parameters
+     *
+     * @access public
+     * @param  string    $sql      SQL query
+     * @param  array     $inputValues   Named input parameters for the statement. Must be associative where the key is the parameter's name and value is the corresponding input.
+     * @param  array     $outputValues   Output or In/Out parameters for the statement. Must be associative where the key is the parameter and each value is a reference to a defined variable where the output will be stored.
+     * @return \PDOStatement|false
+     */
+    public function executeNamed($sql, array $inputValues = array(), array $outputValues = array())
+    {
+       $test = $this->statementHandler
+            ->withSql($sql)
+            ->withNamedParams($inputValues)
+            ->withOutputParams($outputValues)
+            ->execute($outputValues);
+
+        return $test;
+    }
+
+    /**
      * Run a transaction
      *
      * @access public
