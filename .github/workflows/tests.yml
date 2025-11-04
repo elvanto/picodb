@@ -61,7 +61,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-versions }}
-          extensions: pdo_mysql, pdo_pgsql, pdo_sqlite
+          extensions: pdo_mysql, pdo_pgsql, pdo_sqlite, sqlsrv, pdo_sqlsrv
 
       - name: Validate composer.json and composer.lock
         run: composer validate
@@ -137,7 +137,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-versions }}
-          extensions: pdo_mysql, pdo_pgsql, pdo_sqlite, pdo_sqlsrv
+          extensions: pdo_mysql, pdo_pgsql, pdo_sqlite, sqlsrv, pdo_sqlsrv
 
       - name: Validate composer.json and composer.lock
         run: composer validate
