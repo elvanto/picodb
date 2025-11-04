@@ -184,18 +184,23 @@ class Mssql extends Base
      *
      * @param int $limit
      * @param int $offset
+     * @param string|null $order
      * @return string
      */
-    public function getLimitClause($limit, $offset)
+    public function getLimitClause($limit, $offset, $order)
     {
         $clause = '';
 
         if (! is_null($offset)) {
-            $clause = ' OFFSET '.$offset.' ROWS';
-        }
+            if (empty($order)) {
+                $clause .= ' ORDER BY (SELECT NULL)';
+            }
 
-        if (! is_null($limit)) {
-            $clause .= ' FETCH NEXT '.$limit.' ROWS ONLY';
+            $clause .= ' OFFSET '.$offset.' ROWS';
+
+            if (! is_null($limit)) {
+                $clause .= ' FETCH NEXT '.$limit.' ROWS ONLY';
+            }
         }
 
         return $clause;

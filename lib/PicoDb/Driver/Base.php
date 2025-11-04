@@ -156,9 +156,10 @@ abstract class Base
      *
      * @param int $limit
      * @param int $offset
+     * @param string|null $order
      * @return string
      */
-    public function getLimitClause($limit, $offset)
+    public function getLimitClause($limit, $offset, $order)
     {
         $clause = '';
 
