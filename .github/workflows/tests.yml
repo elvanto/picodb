@@ -57,6 +57,9 @@ jobs:
       - uses: actions/checkout@v2
         name: Check Out Code
 
+      - name: Install SQL Server ODBC Driver
+        run: apt-get install -y unixodbc-dev && ACCEPT_EULA=Y apt-get install -y msodbcsql18
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -132,6 +135,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         name: Check Out Code
+
+      - name: Install SQL Server ODBC Driver
+        run: apt-get install -y unixodbc-dev && ACCEPT_EULA=Y apt-get install -y msodbcsql18
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
