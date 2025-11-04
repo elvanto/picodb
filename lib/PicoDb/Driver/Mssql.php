@@ -192,7 +192,7 @@ class Mssql extends Base
         $clause = '';
 
         if (! is_null($offset)) {
-            if (is_null($order)) {
+            if (empty($order)) {
                 $clause .= ' ORDER BY (SELECT NULL)';
             }
 
