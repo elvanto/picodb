@@ -106,8 +106,8 @@ class MssqlTableTest extends \PHPUnit\Framework\TestCase
 
     public function testLimitOffset()
     {
-        $this->assertEquals('SELECT * FROM [test]       OFFSET 0 ROWS FETCH NEXT 2 ROWS ONLY', $this->db->table('test')->offset(0)->limit(2)->buildSelectQuery());
-        $this->assertEquals('SELECT * FROM [test]       OFFSET 10 ROWS FETCH NEXT 5 ROWS ONLY', $this->db->table('test')->offset(10)->limit(5)->buildSelectQuery());
+        $this->assertEquals('SELECT * FROM [test]       ORDER BY (SELECT NULL) OFFSET 0 ROWS FETCH NEXT 2 ROWS ONLY', $this->db->table('test')->offset(0)->limit(2)->buildSelectQuery());
+        $this->assertEquals('SELECT * FROM [test]       ORDER BY (SELECT NULL) OFFSET 10 ROWS FETCH NEXT 5 ROWS ONLY', $this->db->table('test')->offset(10)->limit(5)->buildSelectQuery());
     }
 
     public function testSubquery()
