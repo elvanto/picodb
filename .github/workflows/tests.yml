@@ -58,7 +58,9 @@ jobs:
         name: Check Out Code
 
       - name: Install SQL Server ODBC Driver
-        run: apt-get install -y unixodbc-dev && ACCEPT_EULA=Y apt-get install -y msodbcsql18
+        run: |
+          sudo apt-get install -y unixodbc-dev
+          sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -137,7 +139,9 @@ jobs:
         name: Check Out Code
 
       - name: Install SQL Server ODBC Driver
-        run: apt-get install -y unixodbc-dev && ACCEPT_EULA=Y apt-get install -y msodbcsql18
+        run: |
+          sudo apt-get install -y unixodbc-dev
+          sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
