@@ -1,0 +1,23 @@
+name: "CodeQL"
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: '*'
+  schedule:
+    - cron: '30 12 1,15 * *'
+
+jobs:
+  analyze:
+    strategy:
+      matrix:
+        php-versions: [ '8.0', '8.1', '8.2', '8.3', '8.4' ]
+    name: Analyze PHP ${{ matrix.php-versions }}
+    uses: tithely/php-workflows/.github/workflows/codeql.yml@main
+    with:
+      github-event-name: ${{ github.event_name }}
+      php-version: ${{ matrix.php-versions }}
+      php-extensions: pdo_mysql, pdo_pgsql, pdo_sqlite, sqlsrv, pdo_sqlsrv
+    secrets:
+      actions-access-token: ${{ secrets.ACTIONS_ACCESS_TOKEN }}
