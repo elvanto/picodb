@@ -22,6 +22,7 @@ jobs:
       - name: Psalm
         uses: docker://ghcr.io/psalm/psalm-github-actions
         with:
+          args: --config=psalm.xml
           security_analysis: true
           report_file: psalm-report.sarif
 
