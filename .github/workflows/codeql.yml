@@ -14,7 +14,7 @@ jobs:
       matrix:
         php-versions: [ '8.0', '8.1', '8.2', '8.3', '8.4' ]
     name: Analyze PHP ${{ matrix.php-versions }}
-    uses: tithely/php-workflows/.github/workflows/codeql.yml@main
+    uses: elvanto/php-workflows/.github/workflows/codeql.yml@main
     with:
       github-event-name: ${{ github.event_name }}
       php-version: ${{ matrix.php-versions }}
