@@ -1,3 +1,4 @@
+# Run Psalm Shared Workflow
 name: "CodeQL"
 
 on:
