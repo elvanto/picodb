@@ -10,10 +10,13 @@ on:
     - cron: '30 12 1,15 * *'
 
 jobs:
-  analyze:
+  quality:
+    strategy:
+      matrix:
+        php-versions: [ '8.0', '8.1', '8.2', '8.3', '8.4' ]
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    name: Analyze PHP 
+    name: Psalm Code Quality on PHP ${{ matrix.php-versions }}
 
     steps:
       - uses: actions/checkout@v3
@@ -22,7 +25,30 @@ jobs:
       - name: Psalm
         uses: docker://ghcr.io/psalm/psalm-github-actions
         with:
-          args: --config=psalm.xml
+          php_version: ${{ matrix.php-versions }}
+          report_file: psalm-report.sarif
+
+      - name: Upload SARIF report
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: psalm-report.sarif
+  
+  security:
+    strategy:
+      matrix:
+        php-versions: [ '8.0', '8.1', '8.2', '8.3', '8.4' ]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    name: Psalm Code Security on PHP ${{ matrix.php-versions }}
+
+    steps:
+      - uses: actions/checkout@v3
+        name: Check Out Code
+
+      - name: Psalm
+        uses: docker://ghcr.io/psalm/psalm-github-actions
+        with:
+          php_version: ${{ matrix.php-versions }}
           security_analysis: true
           report_file: psalm-report.sarif
 
