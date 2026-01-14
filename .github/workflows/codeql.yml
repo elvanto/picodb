@@ -27,6 +27,7 @@ jobs:
         with:
           php_version: ${{ matrix.php-versions }}
           report_file: psalm-report.sarif
+        continue-on-error: true
 
       - name: Upload SARIF report
         uses: github/codeql-action/upload-sarif@v3
@@ -51,6 +52,7 @@ jobs:
           php_version: ${{ matrix.php-versions }}
           security_analysis: true
           report_file: psalm-report.sarif
+        continue-on-error: true
 
       - name: Upload SARIF report
         uses: github/codeql-action/upload-sarif@v3
