@@ -13,13 +13,8 @@
         </ignoreFiles>
     </projectFiles>
     <issueHandlers>
-        <PossiblyUnusedMethod>
-            <!-- Suppressing potentially unused since this is a library. -->
-            <errorLevel type="suppress"></errorLevel>
-        </PossiblyUnusedMethod>
-        <MissingOverrideAttribute>
-            <!-- Suppressing missing override attributes to reduce noise. No attributes have been implemented. -->
-            <errorLevel type="suppress"></errorLevel>
-        </MissingOverrideAttribute>
+        <!-- Suppressing some errors since this is a library. -->
+        <PossiblyUnusedMethod errorLevel="suppress" />
+        <MissingOverrideAttribute errorLevel="suppress" />
     </issueHandlers>
 </psalm>
