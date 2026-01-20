@@ -13,13 +13,13 @@ Features
 - Requires only PDO
 - Use prepared statements
 - Handle schema migrations
-- Fully unit tested on PHP 7+
+- Fully unit tested on PHP 8+
 - License: MIT
 
 Requirements
 ------------
 
-- PHP >= 7.0
+- PHP >= 8.0
 - PDO extension
 - Sqlite, Mssql, Mysql or Postgresql
 
@@ -91,7 +91,6 @@ Optional attributes:
 - port
 - ssl_key
 - ssl_cert
-- ssl_key
 - persistent
 - timeout
 - verify_server_cert
@@ -604,7 +603,7 @@ Add/Replace some values:
 $db->hashtable('mytable')
    ->columnKey('column1')
    ->columnValue('column2')
-   ->put(['option1' => 'new value', 'option2' => 'value2']));
+   ->put(['option1' => 'new value', 'option2' => 'value2']);
 ```
 
 Get all values:

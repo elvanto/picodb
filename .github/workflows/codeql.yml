@@ -1,0 +1,64 @@
+# Run Psalm Shared Workflow
+name: "CodeQL"
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: '*'
+  schedule:
+    - cron: '30 12 1,15 * *'
+
+jobs:
+  quality:
+    strategy:
+      matrix:
+        php-versions: [ '8.0', '8.1', '8.2', '8.3', '8.4' ]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    name: Psalm Code Quality on PHP ${{ matrix.php-versions }}
+
+    steps:
+      - uses: actions/checkout@v6
+        name: Check Out Code
+
+      - name: Psalm
+        uses: docker://ghcr.io/psalm/psalm-github-actions
+        with:
+          php_version: ${{ matrix.php-versions }}
+          report_file: psalm-report.sarif
+        continue-on-error: true
+
+      - name: Upload SARIF report
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: psalm-report.sarif
+          matrix: ${{ toJson(matrix) }}
+          category: Psalm Code Quality
+  
+  security:
+    strategy:
+      matrix:
+        php-versions: [ '8.0', '8.1', '8.2', '8.3', '8.4' ]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    name: Psalm Code Security on PHP ${{ matrix.php-versions }}
+
+    steps:
+      - uses: actions/checkout@v6
+        name: Check Out Code
+
+      - name: Psalm
+        uses: docker://ghcr.io/psalm/psalm-github-actions
+        with:
+          php_version: ${{ matrix.php-versions }}
+          security_analysis: true
+          report_file: psalm-report.sarif
+        continue-on-error: true
+
+      - name: Upload SARIF report
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: psalm-report.sarif
+          matrix: ${{ toJson(matrix) }}
+          category: Psalm Code Security
