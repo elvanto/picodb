@@ -18,9 +18,8 @@ abstract class Base
      * List of required settings options
      *
      * @access protected
-     * @var array
      */
-    protected $requiredAttributes = array();
+    protected array $requiredAttributes = array();
 
     /**
      * PDO connection

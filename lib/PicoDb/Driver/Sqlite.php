@@ -17,9 +17,8 @@ class Sqlite extends Base
      * List of required settings options
      *
      * @access protected
-     * @var array
      */
-    protected $requiredAttributes = array('filename');
+    protected array $requiredAttributes = ['filename'];
 
     /**
      * Create a new PDO connection

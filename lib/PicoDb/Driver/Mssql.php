@@ -16,22 +16,20 @@ class Mssql extends Base
      * List of required settings options
      *
      * @access protected
-     * @var array
      */
-    protected $requiredAttributes = array(
+    protected array $requiredAttributes = [
         'hostname',
         'username',
         'password',
         'database',
-    );
+    ];
 
     /**
      * Table to store the schema version
      *
      * @access private
-     * @var array
      */
-    private $schemaTable = 'schema_version';
+    private string $schemaTable = 'schema_version';
 
     /**
      * Create a new PDO connection
