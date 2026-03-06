@@ -251,7 +251,11 @@ abstract class Base
     protected function getSqlFromPreparedStatement($sql, array $values)
     {
         foreach ($values as $value) {
-            $sql = substr_replace($sql, "'$value'", strpos($sql, '?'), 1);
+            $pos = strpos($sql, '?');
+            if ($pos === false) {
+                break;
+            }
+            $sql = substr_replace($sql, "'$value'", $pos, 1);
         }
 
         return $sql;
