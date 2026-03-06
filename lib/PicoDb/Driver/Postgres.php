@@ -64,7 +64,7 @@ class Postgres extends Base
             $options[PDO::ATTR_TIMEOUT] = $settings['timeout'];
         }
 
-        $this->pdo = new PDO($dsn, $username, $password, $options);
+        $this->setConnection(new PDO($dsn, $username, $password, $options));
 
         if (isset($settings['schema_table'])) {
             $this->schemaTable = $settings['schema_table'];
@@ -141,7 +141,7 @@ class Postgres extends Base
     public function getLastId()
     {
         try {
-            $rq = $this->pdo->prepare('SELECT LASTVAL()');
+            $rq = $this->getConnection()->prepare('SELECT LASTVAL()');
             $rq->execute();
 
             return $rq->fetchColumn();
@@ -159,9 +159,9 @@ class Postgres extends Base
      */
     public function getSchemaVersion()
     {
-        $this->pdo->exec("CREATE TABLE IF NOT EXISTS ".$this->schemaTable." (version INTEGER DEFAULT 0)");
+        $this->getConnection()->exec("CREATE TABLE IF NOT EXISTS ".$this->schemaTable." (version INTEGER DEFAULT 0)");
 
-        $rq = $this->pdo->prepare('SELECT "version" FROM "'.$this->schemaTable.'"');
+        $rq = $this->getConnection()->prepare('SELECT "version" FROM "'.$this->schemaTable.'"');
         $rq->execute();
         $result = $rq->fetchColumn();
 
@@ -169,7 +169,7 @@ class Postgres extends Base
             return (int) $result;
         }
         else {
-            $this->pdo->exec('INSERT INTO '.$this->schemaTable.' VALUES(0)');
+            $this->getConnection()->exec('INSERT INTO '.$this->schemaTable.' VALUES(0)');
         }
 
         return 0;
@@ -183,7 +183,7 @@ class Postgres extends Base
      */
     public function setSchemaVersion($version)
     {
-        $rq = $this->pdo->prepare('UPDATE '.$this->schemaTable.' SET version=?');
+        $rq = $this->getConnection()->prepare('UPDATE '.$this->schemaTable.' SET version=?');
         $rq->execute(array($version));
     }
 
