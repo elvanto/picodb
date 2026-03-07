@@ -105,4 +105,36 @@ class StatementHandlerTest extends TestCase
             var_export($logMessages, true)
         );
     }
+
+    public function testMoreValuesThanPlaceholders()
+    {
+        $statementHandler = new class($this->db) extends StatementHandler {
+            public function testBeforeExecute(array $props)
+            {
+                foreach ($props as $key => $value) {
+                    $this->{$key} = $value;
+                }
+                $this->beforeExecute();
+            }
+        };
+
+        // SQL has 1 placeholder but 3 values — extra values should be ignored gracefully
+        $statementHandler->testBeforeExecute([
+            'logQueries' => true,
+            'logQueryValues' => true,
+            'useNamedParams' => false,
+            'sql' => "SELECT * FROM `some_table` WHERE `id` = ?",
+            'lobParams' => ['value1', 'extra_value2', 'extra_value3'],
+            'positionalParams' => [],
+            'namedParams' => [],
+        ]);
+
+        $logMessages = $this->db->getLogMessages();
+        $lastMessage = end($logMessages);
+        self::assertEquals(
+            "SELECT * FROM `some_table` WHERE `id` = 'value1'",
+            $lastMessage,
+            var_export($logMessages, true)
+        );
+    }
 }
