@@ -14,6 +14,23 @@ class SqliteDriverTest extends \PHPUnit\Framework\TestCase
         $this->driver = new Sqlite(array('filename' => ':memory:'));
     }
 
+    public function testGetConnectionReturnsPdo()
+    {
+        $this->assertInstanceOf(PDO::class, $this->driver->getConnection());
+    }
+
+    public function testGetConnectionThrowsWhenNotInitialized()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The database connection is not established.');
+
+        $reflection = new ReflectionProperty(PicoDb\Driver\Base::class, 'pdo');
+        $reflection->setAccessible(true);
+        $reflection->setValue($this->driver, null);
+
+        $this->driver->getConnection();
+    }
+
     public function testMissingRequiredParameter()
     {
         $this->expectException(LogicException::class);

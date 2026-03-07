@@ -17,9 +17,8 @@ class Sqlite extends Base
      * List of required settings options
      *
      * @access protected
-     * @var array
      */
-    protected $requiredAttributes = array('filename');
+    protected array $requiredAttributes = ['filename'];
 
     /**
      * Create a new PDO connection
@@ -35,7 +34,7 @@ class Sqlite extends Base
             $options[PDO::ATTR_TIMEOUT] = $settings['timeout'];
         }
 
-        $this->pdo = new PDO('sqlite:'.$settings['filename'], null, null, $options);
+        $this->setConnection(new PDO('sqlite:'.$settings['filename'], null, null, $options));
         $this->enableForeignKeys();
     }
 
@@ -46,7 +45,7 @@ class Sqlite extends Base
      */
     public function enableForeignKeys()
     {
-        $this->pdo->exec('PRAGMA foreign_keys = ON');
+        $this->getConnection()->exec('PRAGMA foreign_keys = ON');
     }
 
     /**
@@ -56,7 +55,7 @@ class Sqlite extends Base
      */
     public function disableForeignKeys()
     {
-        $this->pdo->exec('PRAGMA foreign_keys = OFF');
+        $this->getConnection()->exec('PRAGMA foreign_keys = OFF');
     }
 
     /**
@@ -107,7 +106,7 @@ class Sqlite extends Base
      */
     public function getLastId()
     {
-        return $this->pdo->lastInsertId();
+        return $this->getConnection()->lastInsertId();
     }
 
     /**
@@ -118,7 +117,7 @@ class Sqlite extends Base
      */
     public function getSchemaVersion()
     {
-        $rq = $this->pdo->prepare('PRAGMA user_version');
+        $rq = $this->getConnection()->prepare('PRAGMA user_version');
         $rq->execute();
 
         return (int) $rq->fetchColumn();
@@ -132,7 +131,7 @@ class Sqlite extends Base
      */
     public function setSchemaVersion($version)
     {
-        $this->pdo->exec('PRAGMA user_version='.$version);
+        $this->getConnection()->exec('PRAGMA user_version='.$version);
     }
 
     /**
@@ -148,7 +147,7 @@ class Sqlite extends Base
     public function upsert($table, $keyColumn, $valueColumn, array $dictionary)
     {
         try {
-            $this->pdo->beginTransaction();
+            $this->getConnection()->beginTransaction();
 
             foreach ($dictionary as $key => $value) {
 
@@ -159,16 +158,16 @@ class Sqlite extends Base
                     $this->escape($valueColumn)
                 );
 
-                $rq = $this->pdo->prepare($sql);
+                $rq = $this->getConnection()->prepare($sql);
                 $rq->execute(array($key, $value));
             }
 
-            $this->pdo->commit();
+            $this->getConnection()->commit();
 
             return true;
         }
         catch (PDOException $e) {
-            $this->pdo->rollBack();
+            $this->getConnection()->rollBack();
             return false;
         }
     }

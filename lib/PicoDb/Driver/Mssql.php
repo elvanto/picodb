@@ -16,22 +16,20 @@ class Mssql extends Base
      * List of required settings options
      *
      * @access protected
-     * @var array
      */
-    protected $requiredAttributes = array(
+    protected array $requiredAttributes = [
         'hostname',
         'username',
         'password',
         'database',
-    );
+    ];
 
     /**
      * Table to store the schema version
      *
      * @access private
-     * @var array
      */
-    private $schemaTable = 'schema_version';
+    private string $schemaTable = 'schema_version';
 
     /**
      * Create a new PDO connection
@@ -50,7 +48,7 @@ class Mssql extends Base
             $dsn .= ';TrustServerCertificate=' . ($settings['trust_server_cert'] ? 'true' : 'false');
         }
 
-        $this->pdo = new PDO($dsn, $settings['username'], $settings['password']);
+        $this->setConnection(new PDO($dsn, $settings['username'], $settings['password']));
 
         if (isset($settings['schema_table'])) {
             $this->schemaTable = $settings['schema_table'];
@@ -64,7 +62,7 @@ class Mssql extends Base
      */
     public function enableForeignKeys()
     {
-        $this->pdo->exec('EXEC sp_MSforeachtable @command1="ALTER TABLE ? CHECK CONSTRAINT ALL"; GO;');
+        $this->getConnection()->exec('EXEC sp_MSforeachtable @command1="ALTER TABLE ? CHECK CONSTRAINT ALL"; GO;');
     }
 
     /**
@@ -74,7 +72,7 @@ class Mssql extends Base
      */
     public function disableForeignKeys()
     {
-        $this->pdo->exec('EXEC sp_MSforeachtable @command1="ALTER TABLE ? NOCHECK CONSTRAINT ALL"; GO;');
+        $this->getConnection()->exec('EXEC sp_MSforeachtable @command1="ALTER TABLE ? NOCHECK CONSTRAINT ALL"; GO;');
     }
 
     /**
@@ -127,7 +125,7 @@ class Mssql extends Base
      */
     public function getLastId()
     {
-        return $this->pdo->lastInsertId();
+        return $this->getConnection()->lastInsertId();
     }
 
     /**
@@ -138,9 +136,9 @@ class Mssql extends Base
      */
     public function getSchemaVersion()
     {
-        $this->pdo->exec("IF (OBJECT_ID('".$this->schemaTable."')) IS NULL CREATE TABLE [".$this->schemaTable."] ([version] INT DEFAULT '0')");
+        $this->getConnection()->exec("IF (OBJECT_ID('".$this->schemaTable."')) IS NULL CREATE TABLE [".$this->schemaTable."] ([version] INT DEFAULT '0')");
 
-        $rq = $this->pdo->prepare('SELECT [version] FROM ['.$this->schemaTable.']');
+        $rq = $this->getConnection()->prepare('SELECT [version] FROM ['.$this->schemaTable.']');
         $rq->execute();
         $result = $rq->fetchColumn();
 
@@ -148,7 +146,7 @@ class Mssql extends Base
             return (int) $result;
         }
         else {
-            $this->pdo->exec('INSERT INTO ['.$this->schemaTable.'] VALUES(0)');
+            $this->getConnection()->exec('INSERT INTO ['.$this->schemaTable.'] VALUES(0)');
         }
 
         return 0;
@@ -162,7 +160,7 @@ class Mssql extends Base
      */
     public function setSchemaVersion($version)
     {
-        $rq = $this->pdo->prepare('UPDATE ['.$this->schemaTable.'] SET [version]=?');
+        $rq = $this->getConnection()->prepare('UPDATE ['.$this->schemaTable.'] SET [version]=?');
         $rq->execute(array($version));
     }
 

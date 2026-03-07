@@ -17,22 +17,20 @@ class Mysql extends Base
      * List of required settings options
      *
      * @access protected
-     * @var array
      */
-    protected $requiredAttributes = array(
+    protected array $requiredAttributes = [
         'hostname',
         'username',
         'password',
         'database',
-    );
+    ];
 
     /**
      * Table to store the schema version
      *
      * @access private
-     * @var array
      */
-    private $schemaTable = 'schema_version';
+    private string $schemaTable = 'schema_version';
 
     /**
      * Create a new PDO connection
@@ -42,12 +40,12 @@ class Mysql extends Base
      */
     public function createConnection(array $settings)
     {
-        $this->pdo = new PDO(
+        $this->setConnection(new PDO(
             $this->buildDsn($settings),
             $settings['username'],
             $settings['password'],
             $this->buildOptions($settings)
-        );
+        ));
 
         if (isset($settings['schema_table'])) {
             $this->schemaTable = $settings['schema_table'];
@@ -124,7 +122,7 @@ class Mysql extends Base
      */
     public function enableForeignKeys()
     {
-        $this->pdo->exec('SET FOREIGN_KEY_CHECKS=1');
+        $this->getConnection()->exec('SET FOREIGN_KEY_CHECKS=1');
     }
 
     /**
@@ -134,7 +132,7 @@ class Mysql extends Base
      */
     public function disableForeignKeys()
     {
-        $this->pdo->exec('SET FOREIGN_KEY_CHECKS=0');
+        $this->getConnection()->exec('SET FOREIGN_KEY_CHECKS=0');
     }
 
     /**
@@ -188,7 +186,7 @@ class Mysql extends Base
      */
     public function getLastId()
     {
-        return $this->pdo->lastInsertId();
+        return $this->getConnection()->lastInsertId();
     }
 
     /**
@@ -199,9 +197,9 @@ class Mysql extends Base
      */
     public function getSchemaVersion()
     {
-        $this->pdo->exec("CREATE TABLE IF NOT EXISTS `".$this->schemaTable."` (`version` INT DEFAULT '0') ENGINE=InnoDB CHARSET=utf8");
+        $this->getConnection()->exec("CREATE TABLE IF NOT EXISTS `".$this->schemaTable."` (`version` INT DEFAULT '0') ENGINE=InnoDB CHARSET=utf8");
 
-        $rq = $this->pdo->prepare('SELECT `version` FROM `'.$this->schemaTable.'`');
+        $rq = $this->getConnection()->prepare('SELECT `version` FROM `'.$this->schemaTable.'`');
         $rq->execute();
         $result = $rq->fetchColumn();
 
@@ -209,7 +207,7 @@ class Mysql extends Base
             return (int) $result;
         }
         else {
-            $this->pdo->exec('INSERT INTO `'.$this->schemaTable.'` VALUES(0)');
+            $this->getConnection()->exec('INSERT INTO `'.$this->schemaTable.'` VALUES(0)');
         }
 
         return 0;
@@ -223,7 +221,7 @@ class Mysql extends Base
      */
     public function setSchemaVersion($version)
     {
-        $rq = $this->pdo->prepare('UPDATE `'.$this->schemaTable.'` SET `version`=?');
+        $rq = $this->getConnection()->prepare('UPDATE `'.$this->schemaTable.'` SET `version`=?');
         $rq->execute(array($version));
     }
 
@@ -256,7 +254,7 @@ class Mysql extends Base
                 $values[] = $value;
             }
 
-            $rq = $this->pdo->prepare($sql);
+            $rq = $this->getConnection()->prepare($sql);
             $rq->execute($values);
 
             return true;
