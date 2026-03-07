@@ -366,6 +366,14 @@ class MssqlTableTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(array(2, 5), $table->getConditionBuilder()->getValues());
     }
 
+    public function testWithXor()
+    {
+        $table = $this->db->table('test');
+
+        $this->assertEquals('SELECT * FROM [test]   WHERE [a] IS NOT NULL AND ([b] = ? XOR [c] >= ?)', $table->notNull('a')->withXor(fn($q) => $q->eq('b', 2)->gte('c', 5))->buildSelectQuery());
+        $this->assertEquals(array(2, 5), $table->getConditionBuilder()->getValues());
+    }
+
     public function testHavingSubquery()
     {
         $table = $this->db->table('test')->notNull('a')->beginOr()->eq('b', 2)->gte('c', 5)->closeOr();
