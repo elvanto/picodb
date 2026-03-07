@@ -927,6 +927,63 @@ class Table
     }
 
     /**
+     * Wrap conditions with AND logic using a callback
+     *
+     * @param Closure(static) $callback
+     */
+    public function withAnd(Closure $callback): static
+    {
+        $this->beginAnd();
+        $callback($this);
+        $this->closeAnd();
+        return $this;
+    }
+
+    /**
+     * Wrap conditions with OR logic using a callback
+     *
+     * @param Closure(static) $callback
+     */
+    public function withOr(Closure $callback): static
+    {
+        $this->beginOr();
+        $callback($this);
+        $this->closeOr();
+        return $this;
+    }
+
+    /**
+     * Wrap conditions with NOT logic using a callback
+     *
+     * Unlike withAnd/withOr/withXor, NOT always joins multiple conditions with AND internally.
+     * To negate an OR group, nest withOr inside: withNot(fn($q) => $q->withOr(...))
+     *
+     * @param Closure(static) $callback
+     */
+    public function withNot(Closure $callback): static
+    {
+        $this->beginNot();
+        $callback($this);
+        $this->closeNot();
+        return $this;
+    }
+
+    /**
+     * Wrap conditions with XOR logic using a callback
+     *
+     * Only supported by MySQL and MSSQL. Not supported by SQLite or PostgreSQL.
+     *
+     * @param Closure(static) $callback
+     */
+    public function withXor(Closure $callback): static
+    {
+        $this->beginXor();
+        $callback($this);
+        $this->closeXor();
+        return $this;
+    }
+
+    /**
      * Magic method for sql conditions
      *
      * @access public
