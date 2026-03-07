@@ -113,32 +113,6 @@ Optional attributes:
 - port
 - schema_table
 
-#### Connecting from an environment variable:
-
-Let's say you have defined an environment variable:
-
-```bash
-export DATABASE_URL=postgres://user:pass@hostname:6212/db
-```
-
-PicoDb can parse automatically this URL for you:
-
-```php
-use PicoDb\UrlParser;
-use PicoDb\Database;
-
-$db = new Database(UrlParser::getInstance()->getSettings());
-```
-
-#### Connecting from a URL
-
-```php
-use PicoDb\UrlParser;
-use PicoDb\Database;
-
-$db = new Database(UrlParser::getInstance()->getSettings('postgres://user:pass@hostname:6212/db'));
-```
-
 ### Execute any SQL query
 
 ```php
