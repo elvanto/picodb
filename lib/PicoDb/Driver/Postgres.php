@@ -133,6 +133,44 @@ class Postgres extends Base
     }
 
     /**
+     * Convert a JSONPath expression ($.key or $.key1.key2) to a Postgres path value
+     * and select the appropriate operator.
+     *
+     * Single-key paths use ->> / -> operators; nested paths use #>> / #> operators
+     * with a path literal like {key1,key2}.
+     *
+     * @param  string $path  JSONPath expression
+     * @return array{0: string, 1: string, 2: string}  [path value, text operator, jsonb operator]
+     */
+    private function convertJsonPath(string $path): array
+    {
+        $stripped = substr($path, 2); // strip leading '$.'
+        $parts = explode('.', $stripped);
+
+        if (count($parts) === 1) {
+            return [$parts[0], '->>', '->'];
+        }
+
+        return ['{'.implode(',', $parts).'}', '#>>', '#>'];
+    }
+
+    public function buildJsonExtractCondition(string $column, string $path, string $operator = '='): array
+    {
+        [$pgPath, $textOp] = $this->convertJsonPath($path);
+        return [$column.$textOp.'? '.$operator.' ?', [$pgPath]];
+    }
+
+    public function buildJsonContainsCondition(string $column, ?string $path, array $values): array
+    {
+        if ($path === null) {
+            return [$column.' @> ?::jsonb', [json_encode($values)]];
+        }
+
+        [$pgPath, , $jsonbOp] = $this->convertJsonPath($path);
+        return [$column.$jsonbOp.'? @> ?::jsonb', [$pgPath, json_encode($values)]];
+    }
+
+    /**
      * Get last inserted id
      *
      * @access public

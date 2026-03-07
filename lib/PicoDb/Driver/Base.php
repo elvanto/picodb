@@ -86,6 +86,39 @@ abstract class Base
     abstract public function getOperator($operator);
 
     /**
+     * Build a JSON field equality condition
+     *
+     * Returns [string $sql, array $preValueBindings] where $sql contains a trailing ?
+     * for the comparison value, and $preValueBindings contains any path-related bindings
+     * that must be merged before the value.
+     *
+     * @abstract
+     * @access public
+     * @param  string  $column    Escaped column identifier
+     * @param  string  $path      JSONPath expression (e.g. '$.key' or '$.key1.key2')
+     * @param  string  $operator  Comparison operator, defaults to '='
+     * @return array{0: string, 1: array}
+     */
+    abstract public function buildJsonExtractCondition(string $column, string $path, string $operator = '='): array;
+
+    /**
+     * Build a JSON array containment condition
+     *
+     * Checks that all elements of $values exist in the JSON array stored in $column
+     * (optionally at $path within the column).
+     *
+     * Returns [string $sql, array $bindings] — a complete condition with all bindings included.
+     *
+     * @abstract
+     * @access public
+     * @param  string      $column  Escaped column identifier
+     * @param  string|null $path    JSONPath expression, or null to target the column directly
+     * @param  array       $values  The values that must all be present in the JSON array
+     * @return array{0: string, 1: array}
+     */
+    abstract public function buildJsonContainsCondition(string $column, ?string $path, array $values): array;
+
+    /**
      * Get last inserted id
      *
      * @abstract
