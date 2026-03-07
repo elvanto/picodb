@@ -479,4 +479,104 @@ class BaseConditionBuilder
     {
         $this->addCondition($this->db->escapeIdentifier($column).' IS NOT NULL');
     }
+
+    /**
+     * Normalize a JSON path to JSONPath format ($.key).
+     * Accepts 'key', '$.key', 'key1.key2', or '$.key1.key2'.
+     *
+     * @access private
+     * @param  string $path
+     * @return string
+     */
+    private function normalizeJsonPath(string $path): string
+    {
+        return str_starts_with($path, '$') ? $path : '$.'.$path;
+    }
+
+    /**
+     * JSON field equality condition
+     *
+     * Compares a scalar value extracted from a JSON column at the given JSONPath.
+     *
+     * @access public
+     * @param  string  $column  Column name
+     * @param  string  $path    JSONPath expression (e.g. '$.key' or '$.key1.key2')
+     * @param  mixed   $value   Value to compare against
+     */
+    public function jsonEq(string $column, string $path, $value): void
+    {
+        [$sql, $preValueBindings] = $this->db->getDriver()->buildJsonExtractCondition(
+            $this->db->escapeIdentifier($column),
+            $this->normalizeJsonPath($path)
+        );
+
+        $this->addCondition($sql);
+        $this->values = array_merge($this->values, $preValueBindings, [$value]);
+    }
+
+    /**
+     * JSON field inequality condition
+     *
+     * @access public
+     * @param  string  $column  Column name
+     * @param  string  $path    JSONPath expression (e.g. 'key' or '$.key' or '$.key1.key2')
+     * @param  mixed   $value   Value to compare against
+     */
+    public function jsonNeq(string $column, string $path, $value): void
+    {
+        [$sql, $preValueBindings] = $this->db->getDriver()->buildJsonExtractCondition(
+            $this->db->escapeIdentifier($column),
+            $this->normalizeJsonPath($path),
+            '!='
+        );
+
+        $this->addCondition($sql);
+        $this->values = array_merge($this->values, $preValueBindings, [$value]);
+    }
+
+    /**
+     * JSON array containment condition
+     *
+     * Checks that all elements of $values exist in the JSON array stored in $column,
+     * optionally at a JSONPath within the column.
+     *
+     * @access public
+     * @param  string      $column  Column name
+     * @param  array       $values  Values that must all be present in the JSON array
+     * @param  string|null $path    JSONPath expression, or null to target the column directly
+     */
+    public function jsonContains(string $column, array $values, ?string $path = null): void
+    {
+        [$sql, $bindings] = $this->db->getDriver()->buildJsonContainsCondition(
+            $this->db->escapeIdentifier($column),
+            $path !== null ? $this->normalizeJsonPath($path) : null,
+            $values
+        );
+
+        $this->addCondition($sql);
+        $this->values = array_merge($this->values, $bindings);
+    }
+
+    /**
+     * JSON array non-containment condition
+     *
+     * The inverse of jsonContains — matches rows where the JSON array does NOT
+     * contain all of the given values.
+     *
+     * @access public
+     * @param  string      $column  Column name
+     * @param  array       $values  Values that must not all be present in the JSON array
+     * @param  string|null $path    JSONPath expression, or null to target the column directly
+     */
+    public function jsonNotContains(string $column, array $values, ?string $path = null): void
+    {
+        [$sql, $bindings] = $this->db->getDriver()->buildJsonContainsCondition(
+            $this->db->escapeIdentifier($column),
+            $path !== null ? $this->normalizeJsonPath($path) : null,
+            $values
+        );
+
+        $this->addCondition('NOT ('.$sql.')');
+        $this->values = array_merge($this->values, $bindings);
+    }
 }
