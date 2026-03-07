@@ -70,7 +70,7 @@ class Table
      * Aggregated Condition instance
      *
      * @access protected
-     * @var    $aggregatedConditionBuilder
+     * @var    AggregatedConditionBuilder
      */
     protected $aggregatedConditionBuilder;
 
