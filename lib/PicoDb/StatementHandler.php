@@ -280,7 +280,7 @@ class StatementHandler
 
         foreach ($this->positionalParams as $value) {
             switch (true) {
-                case is_numeric($value):
+                case is_int($value):
                     $pdoStatement->bindValue($i, $value, PDO::PARAM_INT);
                     break;
                 case is_bool($value):
@@ -297,7 +297,7 @@ class StatementHandler
 
         foreach ($this->namedParams as $name => $value) {
             switch (true) {
-                case is_numeric($value):
+                case is_int($value):
                     $pdoStatement->bindValue($name, $value, PDO::PARAM_INT);
                     break;
                 case is_bool($value):
