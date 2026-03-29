@@ -401,39 +401,39 @@ class SqliteTableTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(array(2, 5), $table->getConditionBuilder()->getValues());
     }
 
-    public function testWithAnd()
+    public function testAnd()
     {
         $table = $this->db->table('test');
 
-        $this->assertEquals('SELECT * FROM "test"   WHERE ("a" = ? AND "b" = ?)', $table->withAnd(fn($q) => $q->eq('a', 1)->eq('b', 2))->buildSelectQuery());
+        $this->assertEquals('SELECT * FROM "test"   WHERE ("a" = ? AND "b" = ?)', $table->and(fn($q) => $q->eq('a', 1)->eq('b', 2))->buildSelectQuery());
         $this->assertEquals(array(1, 2), $table->getConditionBuilder()->getValues());
     }
 
-    public function testWithOr()
+    public function testOr()
     {
         $table = $this->db->table('test');
 
-        $this->assertEquals('SELECT * FROM "test"   WHERE ("a" = ? OR "b" = ?)', $table->withOr(fn($q) => $q->eq('a', 1)->eq('b', 2))->buildSelectQuery());
+        $this->assertEquals('SELECT * FROM "test"   WHERE ("a" = ? OR "b" = ?)', $table->or(fn($q) => $q->eq('a', 1)->eq('b', 2))->buildSelectQuery());
         $this->assertEquals(array(1, 2), $table->getConditionBuilder()->getValues());
     }
 
-    public function testWithNot()
+    public function testNot()
     {
         $table = $this->db->table('test');
 
-        $this->assertEquals('SELECT * FROM "test"   WHERE NOT ("a" = ? AND "b" = ?)', $table->withNot(fn($q) => $q->eq('a', 1)->eq('b', 2))->buildSelectQuery());
+        $this->assertEquals('SELECT * FROM "test"   WHERE NOT ("a" = ? AND "b" = ?)', $table->not(fn($q) => $q->eq('a', 1)->eq('b', 2))->buildSelectQuery());
         $this->assertEquals(array(1, 2), $table->getConditionBuilder()->getValues());
     }
 
-    public function testWithNotSingleCondition()
+    public function testNotSingleCondition()
     {
         $table = $this->db->table('test');
 
-        $this->assertEquals('SELECT * FROM "test"   WHERE NOT "a" = ?', $table->withNot(fn($q) => $q->eq('a', 1))->buildSelectQuery());
+        $this->assertEquals('SELECT * FROM "test"   WHERE NOT "a" = ?', $table->not(fn($q) => $q->eq('a', 1))->buildSelectQuery());
         $this->assertEquals(array(1), $table->getConditionBuilder()->getValues());
     }
 
-    public function testWithOrNested()
+    public function testOrNested()
     {
         $table = $this->db->table('test');
 
@@ -441,9 +441,9 @@ class SqliteTableTest extends \PHPUnit\Framework\TestCase
             'SELECT * FROM "test"   WHERE "a" IS NOT NULL AND ("b" = ? OR ("c" = ? AND "d" >= ?))',
             $table
                 ->notNull('a')
-                ->withOr(fn($q) => $q
+                ->or(fn($q) => $q
                     ->eq('b', 2)
-                    ->withAnd(fn($q) => $q->eq('c', 3)->gte('d', 5))
+                    ->and(fn($q) => $q->eq('c', 3)->gte('d', 5))
                 )
                 ->buildSelectQuery()
         );

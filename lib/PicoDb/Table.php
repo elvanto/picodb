@@ -931,7 +931,7 @@ class Table
      *
      * @param Closure(static) $callback
      */
-    public function withAnd(Closure $callback): static
+    public function and(Closure $callback): static
     {
         $this->beginAnd();
         $callback($this);
@@ -944,7 +944,7 @@ class Table
      *
      * @param Closure(static) $callback
      */
-    public function withOr(Closure $callback): static
+    public function or(Closure $callback): static
     {
         $this->beginOr();
         $callback($this);
@@ -955,12 +955,12 @@ class Table
     /**
      * Wrap conditions with NOT logic using a callback
      *
-     * Unlike withAnd/withOr/withXor, NOT always joins multiple conditions with AND internally.
-     * To negate an OR group, nest withOr inside: withNot(fn($q) => $q->withOr(...))
+     * Unlike and/or/xor, NOT always joins multiple conditions with AND internally.
+     * To negate an OR group, nest or inside: not(fn($q) => $q->or(...))
      *
      * @param Closure(static) $callback
      */
-    public function withNot(Closure $callback): static
+    public function not(Closure $callback): static
     {
         $this->beginNot();
         $callback($this);
@@ -975,7 +975,7 @@ class Table
      *
      * @param Closure(static) $callback
      */
-    public function withXor(Closure $callback): static
+    public function xor(Closure $callback): static
     {
         $this->beginXor();
         $callback($this);
