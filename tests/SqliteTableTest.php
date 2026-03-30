@@ -401,6 +401,55 @@ class SqliteTableTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(array(2, 5), $table->getConditionBuilder()->getValues());
     }
 
+    public function testAnd()
+    {
+        $table = $this->db->table('test');
+
+        $this->assertEquals('SELECT * FROM "test"   WHERE ("a" = ? AND "b" = ?)', $table->and(fn($q) => $q->eq('a', 1)->eq('b', 2))->buildSelectQuery());
+        $this->assertEquals(array(1, 2), $table->getConditionBuilder()->getValues());
+    }
+
+    public function testOr()
+    {
+        $table = $this->db->table('test');
+
+        $this->assertEquals('SELECT * FROM "test"   WHERE ("a" = ? OR "b" = ?)', $table->or(fn($q) => $q->eq('a', 1)->eq('b', 2))->buildSelectQuery());
+        $this->assertEquals(array(1, 2), $table->getConditionBuilder()->getValues());
+    }
+
+    public function testNot()
+    {
+        $table = $this->db->table('test');
+
+        $this->assertEquals('SELECT * FROM "test"   WHERE NOT ("a" = ? AND "b" = ?)', $table->not(fn($q) => $q->eq('a', 1)->eq('b', 2))->buildSelectQuery());
+        $this->assertEquals(array(1, 2), $table->getConditionBuilder()->getValues());
+    }
+
+    public function testNotSingleCondition()
+    {
+        $table = $this->db->table('test');
+
+        $this->assertEquals('SELECT * FROM "test"   WHERE NOT "a" = ?', $table->not(fn($q) => $q->eq('a', 1))->buildSelectQuery());
+        $this->assertEquals(array(1), $table->getConditionBuilder()->getValues());
+    }
+
+    public function testOrNested()
+    {
+        $table = $this->db->table('test');
+
+        $this->assertEquals(
+            'SELECT * FROM "test"   WHERE "a" IS NOT NULL AND ("b" = ? OR ("c" = ? AND "d" >= ?))',
+            $table
+                ->notNull('a')
+                ->or(fn($q) => $q
+                    ->eq('b', 2)
+                    ->and(fn($q) => $q->eq('c', 3)->gte('d', 5))
+                )
+                ->buildSelectQuery()
+        );
+        $this->assertEquals(array(2, 3, 5), $table->getConditionBuilder()->getValues());
+    }
+
     public function testHavingSubquery()
     {
         $table = $this->db->table('test')->notNull('a')->beginOr()->eq('b', 2)->gte('c', 5)->closeOr();

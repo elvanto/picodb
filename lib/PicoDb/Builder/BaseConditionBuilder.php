@@ -177,7 +177,9 @@ class BaseConditionBuilder
     }
 
     /**
-     * Start OR condition
+     * Start XOR condition
+     *
+     * Only supported by MySQL and MSSQL. Not supported by SQLite or PostgreSQL.
      *
      * @access public
      */
