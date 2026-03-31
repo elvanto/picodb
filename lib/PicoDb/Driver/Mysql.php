@@ -182,9 +182,8 @@ class Mysql extends Base
      * Get last inserted id
      *
      * @access public
-     * @return integer
      */
-    public function getLastId()
+    public function getLastId(): string|false
     {
         return $this->getConnection()->lastInsertId();
     }

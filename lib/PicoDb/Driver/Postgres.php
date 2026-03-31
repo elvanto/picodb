@@ -134,18 +134,17 @@ class Postgres extends Base
      * Get last inserted id
      *
      * @access public
-     * @return integer
      */
-    public function getLastId()
+    public function getLastId(): string|false
     {
         try {
             $rq = $this->getConnection()->prepare('SELECT LASTVAL()');
             $rq->execute();
 
-            return $rq->fetchColumn();
+            return (string) $rq->fetchColumn();
         }
         catch (PDOException $e) {
-            return 0;
+            return false;
         }
     }
 

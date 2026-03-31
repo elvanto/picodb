@@ -88,9 +88,8 @@ abstract class Base
      *
      * @abstract
      * @access public
-     * @return integer
      */
-    abstract public function getLastId();
+    abstract public function getLastId(): string|false;
 
     /**
      * Get current schema version
