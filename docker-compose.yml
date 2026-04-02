@@ -7,6 +7,7 @@ services:
     links:
       - mysql
       - postgres
+      - sqlserver
     environment:
       - MYSQL_HOST=mysql
       - POSTGRES_HOST=postgres

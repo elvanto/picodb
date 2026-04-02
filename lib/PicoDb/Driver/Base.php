@@ -18,17 +18,15 @@ abstract class Base
      * List of required settings options
      *
      * @access protected
-     * @var array
      */
-    protected $requiredAttributes = array();
+    protected array $requiredAttributes = array();
 
     /**
      * PDO connection
      *
-     * @access protected
-     * @var PDO
+     * @access private
      */
-    protected $pdo = null;
+    private ?PDO $pdo = null;
 
     /**
      * Create a new PDO connection
@@ -90,9 +88,8 @@ abstract class Base
      *
      * @abstract
      * @access public
-     * @return integer
      */
-    abstract public function getLastId();
+    abstract public function getLastId(): string|false;
 
     /**
      * Get current schema version
@@ -127,18 +124,32 @@ abstract class Base
         }
 
         $this->createConnection($settings);
-        $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $this->getConnection()->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
 
     /**
      * Get the PDO connection
      *
      * @access public
-     * @return PDO
+     * @throws LogicException
      */
-    public function getConnection()
+    public function getConnection(): PDO
     {
+        if ($this->pdo === null) {
+            throw new LogicException('The database connection is not established.');
+        }
+
         return $this->pdo;
+    }
+
+    /**
+     * Set the PDO connection
+     *
+     * @access protected
+     */
+    protected function setConnection(PDO $pdo): void
+    {
+        $this->pdo = $pdo;
     }
 
     /**
@@ -187,29 +198,29 @@ abstract class Base
     public function upsert($table, $keyColumn, $valueColumn, array $dictionary)
     {
         try {
-            $this->pdo->beginTransaction();
+            $this->getConnection()->beginTransaction();
 
             foreach ($dictionary as $key => $value) {
 
-                $rq = $this->pdo->prepare('SELECT 1 FROM '.$this->escape($table).' WHERE '.$this->escape($keyColumn).'=?');
+                $rq = $this->getConnection()->prepare('SELECT 1 FROM '.$this->escape($table).' WHERE '.$this->escape($keyColumn).'=?');
                 $rq->execute(array($key));
 
                 if ($rq->fetchColumn()) {
-                    $rq = $this->pdo->prepare('UPDATE '.$this->escape($table).' SET '.$this->escape($valueColumn).'=? WHERE '.$this->escape($keyColumn).'=?');
+                    $rq = $this->getConnection()->prepare('UPDATE '.$this->escape($table).' SET '.$this->escape($valueColumn).'=? WHERE '.$this->escape($keyColumn).'=?');
                     $rq->execute(array($value, $key));
                 }
                 else {
-                    $rq = $this->pdo->prepare('INSERT INTO '.$this->escape($table).' ('.$this->escape($keyColumn).', '.$this->escape($valueColumn).') VALUES (?, ?)');
+                    $rq = $this->getConnection()->prepare('INSERT INTO '.$this->escape($table).' ('.$this->escape($keyColumn).', '.$this->escape($valueColumn).') VALUES (?, ?)');
                     $rq->execute(array($key, $value));
                 }
             }
 
-            $this->pdo->commit();
+            $this->getConnection()->commit();
 
             return true;
         }
         catch (PDOException $e) {
-            $this->pdo->rollBack();
+            $this->getConnection()->rollBack();
             return false;
         }
     }
@@ -238,7 +249,11 @@ abstract class Base
     protected function getSqlFromPreparedStatement($sql, array $values)
     {
         foreach ($values as $value) {
-            $sql = substr_replace($sql, "'$value'", strpos($sql, '?'), 1);
+            $pos = strpos($sql, '?');
+            if ($pos === false) {
+                break;
+            }
+            $sql = substr_replace($sql, "'$value'", $pos, 1);
         }
 
         return $sql;
