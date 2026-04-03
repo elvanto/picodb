@@ -677,4 +677,80 @@ class MysqlTableTest extends \PHPUnit\Framework\TestCase
             $this->db->hashtable('foobar')->getAll('column1', 'column2')
         );
     }
+
+    public function testJsonEq()
+    {
+        $this->assertNotFalse($this->db->execute('CREATE TABLE foobar (label VARCHAR(50), data JSON)'));
+        $this->assertTrue($this->db->table('foobar')->insert(['label' => 'first',  'data' => '{"user":"alice","address":{"city":"NYC"}}']));
+        $this->assertTrue($this->db->table('foobar')->insert(['label' => 'second', 'data' => '{"user":"bob","address":{"city":"LA"}}']));
+
+        // explicit JSONPath
+        $this->assertEquals('first',  $this->db->table('foobar')->jsonEq('data', '$.user', 'alice')->findOneColumn('label'));
+        $this->assertEquals('second', $this->db->table('foobar')->jsonEq('data', '$.user', 'bob')->findOneColumn('label'));
+        // bare key normalises to same result
+        $this->assertEquals('first',  $this->db->table('foobar')->jsonEq('data', 'user', 'alice')->findOneColumn('label'));
+        // nested path
+        $this->assertEquals('first',  $this->db->table('foobar')->jsonEq('data', 'address.city', 'NYC')->findOneColumn('label'));
+        // no match
+        $this->assertFalse($this->db->table('foobar')->jsonEq('data', 'user', 'charlie')->findOneColumn('label'));
+    }
+
+    public function testJsonNeq()
+    {
+        $this->assertNotFalse($this->db->execute('CREATE TABLE foobar (label VARCHAR(50), data JSON)'));
+        $this->assertTrue($this->db->table('foobar')->insert(['label' => 'first',  'data' => '{"user":"alice"}']));
+        $this->assertTrue($this->db->table('foobar')->insert(['label' => 'second', 'data' => '{"user":"bob"}']));
+
+        $this->assertEquals(1, $this->db->table('foobar')->jsonNeq('data', 'user', 'alice')->count());
+        $this->assertEquals('second', $this->db->table('foobar')->jsonNeq('data', 'user', 'alice')->findOneColumn('label'));
+        $this->assertEquals(2, $this->db->table('foobar')->jsonNeq('data', 'user', 'charlie')->count());
+    }
+
+    public function testJsonContainsOnColumn()
+    {
+        $this->assertNotFalse($this->db->execute('CREATE TABLE foobar (label VARCHAR(50), tags JSON)'));
+        $this->assertTrue($this->db->table('foobar')->insert(['label' => 'first',  'tags' => '["php","js","mysql"]']));
+        $this->assertTrue($this->db->table('foobar')->insert(['label' => 'second', 'tags' => '["python","django"]']));
+
+        $this->assertEquals('first',  $this->db->table('foobar')->jsonContains('tags', ['php', 'js'])->findOneColumn('label'));
+        $this->assertEquals('second', $this->db->table('foobar')->jsonContains('tags', ['python'])->findOneColumn('label'));
+        // values split across rows — neither row contains both
+        $this->assertEquals(0, $this->db->table('foobar')->jsonContains('tags', ['php', 'python'])->count());
+    }
+
+    public function testJsonContainsWithPath()
+    {
+        $this->assertNotFalse($this->db->execute('CREATE TABLE foobar (label VARCHAR(50), data JSON)'));
+        $this->assertTrue($this->db->table('foobar')->insert(['label' => 'first',  'data' => '{"tags":["php","js","mysql"]}']));
+        $this->assertTrue($this->db->table('foobar')->insert(['label' => 'second', 'data' => '{"tags":["python","django"]}']));
+
+        // explicit path
+        $this->assertEquals('first',  $this->db->table('foobar')->jsonContains('data', ['php', 'js'], '$.tags')->findOneColumn('label'));
+        // bare key path
+        $this->assertEquals('first',  $this->db->table('foobar')->jsonContains('data', ['php', 'js'], 'tags')->findOneColumn('label'));
+        $this->assertEquals('second', $this->db->table('foobar')->jsonContains('data', ['python'], 'tags')->findOneColumn('label'));
+        $this->assertEquals(0, $this->db->table('foobar')->jsonContains('data', ['php', 'python'], 'tags')->count());
+    }
+
+    public function testJsonNotContainsOnColumn()
+    {
+        $this->assertNotFalse($this->db->execute('CREATE TABLE foobar (label VARCHAR(50), tags JSON)'));
+        $this->assertTrue($this->db->table('foobar')->insert(['label' => 'first',  'tags' => '["php","js","mysql"]']));
+        $this->assertTrue($this->db->table('foobar')->insert(['label' => 'second', 'tags' => '["python","django"]']));
+
+        $this->assertEquals('second', $this->db->table('foobar')->jsonNotContains('tags', ['php', 'js'])->findOneColumn('label'));
+        $this->assertEquals('first',  $this->db->table('foobar')->jsonNotContains('tags', ['python'])->findOneColumn('label'));
+        $this->assertEquals(2, $this->db->table('foobar')->jsonNotContains('tags', ['php', 'python'])->count());
+    }
+
+    public function testJsonNotContainsWithPath()
+    {
+        $this->assertNotFalse($this->db->execute('CREATE TABLE foobar (label VARCHAR(50), data JSON)'));
+        $this->assertTrue($this->db->table('foobar')->insert(['label' => 'first',  'data' => '{"tags":["php","js","mysql"]}']));
+        $this->assertTrue($this->db->table('foobar')->insert(['label' => 'second', 'data' => '{"tags":["python","django"]}']));
+
+        $this->assertEquals('second', $this->db->table('foobar')->jsonNotContains('data', ['php', 'js'], 'tags')->findOneColumn('label'));
+        $this->assertEquals('first',  $this->db->table('foobar')->jsonNotContains('data', ['python'], 'tags')->findOneColumn('label'));
+        $this->assertEquals(2, $this->db->table('foobar')->jsonNotContains('data', ['php', 'python'], 'tags')->count());
+    }
 }

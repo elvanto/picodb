@@ -46,6 +46,10 @@ use PicoDb\Driver\Mssql;
  * @method   $this   notBetween($column, $lowValue, $highValue)
  * @method   $this   isNull($column)
  * @method   $this   notNull($column)
+ * @method   $this   jsonEq(string $column, string $path, mixed $value)
+ * @method   $this   jsonNeq(string $column, string $path, mixed $value)
+ * @method   $this   jsonContains(string $column, array $values, ?string $path = null)
+ * @method   $this   jsonNotContains(string $column, array $values, ?string $path = null)
  */
 class Table
 {
