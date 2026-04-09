@@ -304,7 +304,7 @@ class StatementHandler
                     $pdoStatement->bindValue($name, $value, PDO::PARAM_BOOL);
                     break;
                 case $value === null:
-                    $pdoStatement->bindValue($i, $value, PDO::PARAM_NULL);
+                    $pdoStatement->bindValue($name, $value, PDO::PARAM_NULL);
                     break;
                 default:
                     $pdoStatement->bindValue($name, $value, PDO::PARAM_STR);
