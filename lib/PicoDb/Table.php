@@ -469,7 +469,7 @@ class Table
     {
         $sql = sprintf(
             'SELECT SUM(%s) FROM %s %s %s %s %s %s %s',
-            $column,
+            $this->db->escapeIdentifier($column),
             $this->db->escapeIdentifier($this->name),
             implode(' ', $this->joins),
             $this->conditionBuilder->build(),
