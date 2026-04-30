@@ -253,7 +253,7 @@ abstract class Base
             if ($pos === false) {
                 break;
             }
-            $sql = substr_replace($sql, "'$value'", $pos, 1);
+            $sql = substr_replace($sql, $this->getConnection()->quote($value), $pos, 1);
         }
 
         return $sql;
