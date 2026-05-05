@@ -445,6 +445,14 @@ class MysqlTableTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(7, $this->db->table('foobar')->sum('a'));
     }
 
+    public function testSumWithReservedWordColumn()
+    {
+        $this->assertNotFalse($this->db->execute('CREATE TABLE foobar (`order` INTEGER)'));
+        $this->assertTrue($this->db->table('foobar')->insert(array('order' => 3)));
+        $this->assertTrue($this->db->table('foobar')->insert(array('order' => 4)));
+        $this->assertEquals(7, $this->db->table('foobar')->sum('order'));
+    }
+
     public function testSumSubqueryHaving()
     {
         $this->assertNotFalse($this->db->execute('CREATE TABLE foobar(foo INTEGER, status INTEGER DEFAULT 0)'));
