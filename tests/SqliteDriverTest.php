@@ -81,4 +81,11 @@ class SqliteDriverTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertStringStartsWith('3.', $this->driver->getDatabaseVersion());
     }
+
+    public function testExplainWithSingleQuoteValue()
+    {
+        $this->driver->getConnection()->exec('CREATE TABLE foobar (name TEXT)');
+        $result = $this->driver->explain('SELECT * FROM "foobar" WHERE "name" = ?', ["O'Brien"]);
+        $this->assertIsArray($result);
+    }
 }

@@ -67,4 +67,11 @@ class MysqlDriverTest extends \PHPUnit\Framework\TestCase
 //    {
 //        $this->assertStringStartsWith('5.', $this->driver->getDatabaseVersion());
 //    }
+
+    public function testExplainWithSingleQuoteValue()
+    {
+        $this->driver->getConnection()->exec('CREATE TABLE foobar (name VARCHAR(100))');
+        $result = $this->driver->explain('SELECT * FROM `foobar` WHERE `name` = ?', ["O'Brien"]);
+        $this->assertIsArray($result);
+    }
 }
