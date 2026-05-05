@@ -117,6 +117,25 @@ class Mssql extends Base
         return '';
     }
 
+    public function buildJsonExtractCondition(string $column, string $path, string $operator = '='): array
+    {
+        return ['JSON_VALUE('.$column.', ?) '.$operator.' ?', [$path]];
+    }
+
+    public function buildJsonContainsCondition(string $column, ?string $path, array $values): array
+    {
+        $count = count($values);
+        $placeholders = implode(', ', array_fill(0, $count, '?'));
+
+        if ($path === null) {
+            $sql = '(SELECT COUNT(*) FROM OPENJSON('.$column.') WHERE value IN ('.$placeholders.')) = '.$count;
+            return [$sql, $values];
+        }
+
+        $sql = '(SELECT COUNT(*) FROM OPENJSON('.$column.', ?) WHERE value IN ('.$placeholders.')) = '.$count;
+        return [$sql, array_merge([$path], $values)];
+    }
+
     /**
      * Get last inserted id
      *
