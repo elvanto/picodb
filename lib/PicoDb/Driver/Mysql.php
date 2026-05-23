@@ -180,9 +180,9 @@ class Mysql extends Base
         return '';
     }
 
-    public function buildJsonExtractCondition(string $column, string $path, string $operator = '='): array
+    public function buildJsonExtractCondition(string $column, string $path, string $operator = '='): string
     {
-        return ['JSON_UNQUOTE(JSON_EXTRACT('.$column.', ?)) '.$operator.' ?', [$path]];
+        return 'JSON_UNQUOTE(JSON_EXTRACT('.$column.', \''.$path.'\')) '.$operator.' ?';
     }
 
     public function buildJsonContainsCondition(string $column, ?string $path, array $values): array
@@ -193,7 +193,7 @@ class Mysql extends Base
             return ['JSON_CONTAINS('.$column.', JSON_ARRAY('.$placeholders.'))', $values];
         }
 
-        return ['JSON_CONTAINS(JSON_EXTRACT('.$column.', ?), JSON_ARRAY('.$placeholders.'))', array_merge([$path], $values)];
+        return ['JSON_CONTAINS(JSON_EXTRACT('.$column.', \''.$path.'\'), JSON_ARRAY('.$placeholders.'))', $values];
     }
 
     /**

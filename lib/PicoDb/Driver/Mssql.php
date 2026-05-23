@@ -119,9 +119,9 @@ class Mssql extends Base
         return '';
     }
 
-    public function buildJsonExtractCondition(string $column, string $path, string $operator = '='): array
+    public function buildJsonExtractCondition(string $column, string $path, string $operator = '='): string
     {
-        return ['JSON_VALUE('.$column.', ?) '.$operator.' ?', [$path]];
+        return 'JSON_VALUE('.$column.', \''.$path.'\') '.$operator.' ?';
     }
 
     public function buildJsonContainsCondition(string $column, ?string $path, array $values): array
@@ -134,8 +134,8 @@ class Mssql extends Base
             return [$sql, $values];
         }
 
-        $sql = '(SELECT COUNT(*) FROM OPENJSON('.$column.', ?) WHERE value IN ('.$placeholders.')) = '.$count;
-        return [$sql, array_merge([$path], $values)];
+        $sql = '(SELECT COUNT(*) FROM OPENJSON('.$column.', \''.$path.'\') WHERE value IN ('.$placeholders.')) = '.$count;
+        return [$sql, $values];
     }
 
     /**

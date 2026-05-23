@@ -88,18 +88,17 @@ abstract class Base
     /**
      * Build a JSON field equality condition
      *
-     * Returns [string $sql, array $preValueBindings] where $sql contains a trailing ?
-     * for the comparison value, and $preValueBindings contains any path-related bindings
-     * that must be merged before the value.
+     * Returns a SQL string with a single trailing ? for the comparison value.
+     * The JSON path is embedded directly as a string literal.
      *
      * @abstract
      * @access public
      * @param  string  $column    Escaped column identifier
      * @param  string  $path      JSONPath expression (e.g. '$.key' or '$.key1.key2')
      * @param  string  $operator  Comparison operator, defaults to '='
-     * @return array{0: string, 1: array}
+     * @return string
      */
-    abstract public function buildJsonExtractCondition(string $column, string $path, string $operator = '='): array;
+    abstract public function buildJsonExtractCondition(string $column, string $path, string $operator = '='): string;
 
     /**
      * Build a JSON array containment condition

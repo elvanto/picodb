@@ -505,13 +505,11 @@ class BaseConditionBuilder
      */
     public function jsonEq(string $column, string $path, $value): void
     {
-        [$sql, $preValueBindings] = $this->db->getDriver()->buildJsonExtractCondition(
+        $this->addCondition($this->db->getDriver()->buildJsonExtractCondition(
             $this->db->escapeIdentifier($column),
             $this->normalizeJsonPath($path)
-        );
-
-        $this->addCondition($sql);
-        $this->values = array_merge($this->values, $preValueBindings, [$value]);
+        ));
+        $this->values[] = $value;
     }
 
     /**
@@ -524,14 +522,12 @@ class BaseConditionBuilder
      */
     public function jsonNeq(string $column, string $path, $value): void
     {
-        [$sql, $preValueBindings] = $this->db->getDriver()->buildJsonExtractCondition(
+        $this->addCondition($this->db->getDriver()->buildJsonExtractCondition(
             $this->db->escapeIdentifier($column),
             $this->normalizeJsonPath($path),
             '!='
-        );
-
-        $this->addCondition($sql);
-        $this->values = array_merge($this->values, $preValueBindings, [$value]);
+        ));
+        $this->values[] = $value;
     }
 
     /**

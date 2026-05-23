@@ -154,10 +154,10 @@ class Postgres extends Base
         return ['{'.implode(',', $parts).'}', '#>>', '#>'];
     }
 
-    public function buildJsonExtractCondition(string $column, string $path, string $operator = '='): array
+    public function buildJsonExtractCondition(string $column, string $path, string $operator = '='): string
     {
         [$pgPath, $textOp] = $this->convertJsonPath($path);
-        return [$column.$textOp.'? '.$operator.' ?', [$pgPath]];
+        return $column.$textOp."'".$pgPath."' ".$operator.' ?';
     }
 
     public function buildJsonContainsCondition(string $column, ?string $path, array $values): array
@@ -167,7 +167,7 @@ class Postgres extends Base
         }
 
         [$pgPath, , $jsonbOp] = $this->convertJsonPath($path);
-        return [$column.$jsonbOp.'? @> ?::jsonb', [$pgPath, json_encode($values)]];
+        return [$column.$jsonbOp."'".$pgPath."' @> ?::jsonb", [json_encode($values)]];
     }
 
     /**
