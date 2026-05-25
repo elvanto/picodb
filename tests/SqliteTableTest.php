@@ -660,6 +660,75 @@ class SqliteTableTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testLeftJoinNullCondition()
+    {
+        $query = $this->db->table('test2')->columns('a', 'b')->left('test1', 't1', 'foreign_key', 'test2', 'id', ['a' => null]);
+
+        $this->assertEquals(
+            'SELECT "a", "b" FROM "test2" LEFT JOIN "test1" AS "t1" ON "t1"."foreign_key"="test2"."id" AND "t1"."a" IS NULL',
+            $query->buildSelectQuery()
+        );
+        $this->assertEquals([], $query->getValues());
+
+        $this->assertNotFalse($this->db->execute('CREATE TABLE test1 (a INTEGER, foreign_key INTEGER NOT NULL)'));
+        $this->assertNotFalse($this->db->execute('CREATE TABLE test2 (id INTEGER NOT NULL, b INTEGER NOT NULL)'));
+
+        $this->assertTrue($this->db->table('test2')->insert(array('id' => 42, 'b' => 2)));
+        $this->assertTrue($this->db->table('test1')->insert(array('a' => null, 'foreign_key' => 42)));
+        $this->assertTrue($this->db->table('test1')->insert(array('a' => 18, 'foreign_key' => 42)));
+
+        $this->assertEquals(
+            array('a' => null, 'b' => 2),
+            $this->db->table('test2')->columns('a', 'b')->left('test1', 't1', 'foreign_key', 'test2', 'id', ['a' => null])->findOne()
+        );
+    }
+
+    public function testInnerJoinConditions()
+    {
+        $this->assertNotFalse($this->db->execute('CREATE TABLE test1 (a INTEGER NOT NULL, foreign_key INTEGER NOT NULL)'));
+        $this->assertNotFalse($this->db->execute('CREATE TABLE test2 (id INTEGER NOT NULL, b INTEGER NOT NULL)'));
+
+        $this->assertTrue($this->db->table('test2')->insert(array('id' => 42, 'b' => 2)));
+        $this->assertTrue($this->db->table('test1')->insert(array('a' => 18, 'foreign_key' => 42)));
+
+        $this->assertEquals(
+            array('a' => 18, 'b' => 2),
+            $this->db->table('test2')->columns('a', 'b')->inner('test1', 't1', 'foreign_key', 'test2', 'id', ['a' => 18])->findOne()
+        );
+
+        $this->assertEquals(
+            array('a' => 18, 'b' => 2),
+            $this->db->table('test2')->columns('a', 'b')->inner('test1', 't1', 'foreign_key', 'test2', 'id', ['a' => [18, 19]])->findOne()
+        );
+
+        $this->assertNull(
+            $this->db->table('test2')->columns('a', 'b')->inner('test1', 't1', 'foreign_key', 'test2', 'id', ['a' => 19])->findOne()
+        );
+    }
+
+    public function testInnerJoinNullCondition()
+    {
+        $query = $this->db->table('test2')->columns('a', 'b')->inner('test1', 't1', 'foreign_key', 'test2', 'id', ['a' => null]);
+
+        $this->assertEquals(
+            'SELECT "a", "b" FROM "test2" JOIN "test1" AS "t1" ON "t1"."foreign_key"="test2"."id" AND "t1"."a" IS NULL',
+            $query->buildSelectQuery()
+        );
+        $this->assertEquals([], $query->getValues());
+
+        $this->assertNotFalse($this->db->execute('CREATE TABLE test1 (a INTEGER, foreign_key INTEGER NOT NULL)'));
+        $this->assertNotFalse($this->db->execute('CREATE TABLE test2 (id INTEGER NOT NULL, b INTEGER NOT NULL)'));
+
+        $this->assertTrue($this->db->table('test2')->insert(array('id' => 42, 'b' => 2)));
+        $this->assertTrue($this->db->table('test1')->insert(array('a' => null, 'foreign_key' => 42)));
+        $this->assertTrue($this->db->table('test1')->insert(array('a' => 18, 'foreign_key' => 42)));
+
+        $this->assertEquals(
+            array('a' => null, 'b' => 2),
+            $this->db->table('test2')->columns('a', 'b')->inner('test1', 't1', 'foreign_key', 'test2', 'id', ['a' => null])->findOne()
+        );
+    }
+
     public function testJoinSubquery()
     {
         $this->assertNotFalse($this->db->execute('CREATE TABLE test1 (id INTEGER NOT NULL, a INTEGER NOT NULL)'));

@@ -573,6 +573,8 @@ class Table
             if (is_array($value)) {
                 $where .= ' AND ' . $this->db->escapeIdentifier($alias1) . '.' . $this->db->escapeIdentifier($column) . ' IN (' . implode(',', array_fill(0, count($value), '?')) . ')';
                 $this->joinValues = array_merge($this->joinValues, $value);
+            } elseif (is_null($value)) {
+                $where .= ' AND ' . $this->db->escapeIdentifier($alias1) . '.' . $this->db->escapeIdentifier($column) . ' IS NULL';
             } else {
                 $where .= ' AND ' . $this->db->escapeIdentifier($alias1) . '.' . $this->db->escapeIdentifier($column) . ' = ?';
                 $this->joinValues[] = $value;
@@ -610,6 +612,8 @@ class Table
             if (is_array($value)) {
                 $where .= ' AND ' . $this->db->escapeIdentifier($alias1) . '.' . $this->db->escapeIdentifier($column) . ' IN (' . implode(',', array_fill(0, count($value), '?')) . ')';
                 $this->joinValues = array_merge($this->joinValues, $value);
+            } elseif (is_null($value)) {
+                $where .= ' AND ' . $this->db->escapeIdentifier($alias1) . '.' . $this->db->escapeIdentifier($column) . ' IS NULL';
             } else {
                 $where .= ' AND ' . $this->db->escapeIdentifier($alias1) . '.' . $this->db->escapeIdentifier($column) . ' = ?';
                 $this->joinValues[] = $value;
