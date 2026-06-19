@@ -132,32 +132,12 @@ class Postgres extends Base
         return '';
     }
 
-    /**
-     * Convert a JSONPath expression ($.key or $.key1.key2) to a Postgres path value
-     * and select the appropriate operator.
-     *
-     * Single-key paths use ->> / -> operators; nested paths use #>> / #> operators
-     * with a path literal like {key1,key2}.
-     *
-     * @param  string $path  JSONPath expression
-     * @return array{0: string, 1: string, 2: string}  [path value, text operator, jsonb operator]
-     */
-    private function convertJsonPath(string $path): array
-    {
-        $stripped = substr($path, 2); // strip leading '$.'
-        $parts = explode('.', $stripped);
-
-        if (count($parts) === 1) {
-            return [$parts[0], '->>', '->'];
-        }
-
-        return ['{'.implode(',', $parts).'}', '#>>', '#>'];
-    }
-
     public function buildJsonExtractCondition(string $column, string $path, string $operator): string
     {
-        [$pgPath, $textOp] = $this->convertJsonPath($path);
-        return $column.$textOp."'".$pgPath."' ".$operator.' ?';
+        // jsonb_path_query_first() parses the JSONPath natively (PG 12+), so the full
+        // grammar is supported (nested keys, array subscripts, wildcards, filters).
+        // #>> '{}' unwraps the resulting scalar jsonb to text for comparison.
+        return 'jsonb_path_query_first('.$column.", '".$path."') #>> '{}' ".$operator.' ?';
     }
 
     public function buildJsonContainsCondition(string $column, ?string $path, array $values): array
@@ -166,8 +146,7 @@ class Postgres extends Base
             return [$column.' @> ?::jsonb', [json_encode($values)]];
         }
 
-        [$pgPath, , $jsonbOp] = $this->convertJsonPath($path);
-        return [$column.$jsonbOp."'".$pgPath."' @> ?::jsonb", [json_encode($values)]];
+        return ['jsonb_path_query_first('.$column.", '".$path."') @> ?::jsonb", [json_encode($values)]];
     }
 
     /**

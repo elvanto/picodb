@@ -676,6 +676,25 @@ class PostgresTableTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->db->table('foobar')->jsonEq('data', 'user', 'charlie')->findOneColumn('label'));
     }
 
+    public function testJsonPathArraySubscriptAndWildcard()
+    {
+        $this->assertNotFalse($this->db->execute('CREATE TABLE foobar (label VARCHAR(50), data JSONB)'));
+        $this->assertTrue($this->db->table('foobar')->insert(['label' => 'first',  'data' => '{"items":["a","b","c"],"groups":[{"tags":["php","js"]}]}']));
+        $this->assertTrue($this->db->table('foobar')->insert(['label' => 'second', 'data' => '{"items":["x","y","z"],"groups":[{"tags":["python"]}]}']));
+
+        // array subscript in an extract path
+        $this->assertEquals('first',  $this->db->table('foobar')->jsonEq('data', '$.items[1]', 'b')->findOneColumn('label'));
+        $this->assertEquals('second', $this->db->table('foobar')->jsonEq('data', '$.items[0]', 'x')->findOneColumn('label'));
+        $this->assertFalse($this->db->table('foobar')->jsonEq('data', '$.items[2]', 'b')->findOneColumn('label'));
+
+        // wildcard — matches against the first element returned
+        $this->assertEquals('first', $this->db->table('foobar')->jsonEq('data', '$.items[*]', 'a')->findOneColumn('label'));
+
+        // array subscript leading into a contains path
+        $this->assertEquals('first', $this->db->table('foobar')->jsonContains('data', ['php', 'js'], '$.groups[0].tags')->findOneColumn('label'));
+        $this->assertEquals(1, $this->db->table('foobar')->jsonContains('data', ['php'], '$.groups[0].tags')->count());
+    }
+
     public function testJsonNeq()
     {
         $this->assertNotFalse($this->db->execute('CREATE TABLE foobar (label VARCHAR(50), data JSONB)'));
