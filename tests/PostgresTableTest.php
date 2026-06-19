@@ -734,4 +734,16 @@ class PostgresTableTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('first',  $this->db->table('foobar')->jsonNotContains('data', ['python'], 'tags')->findOneColumn('label'));
         $this->assertEquals(2, $this->db->table('foobar')->jsonNotContains('data', ['php', 'python'], 'tags')->count());
     }
+
+    public function testJsonContainsEmptyValues()
+    {
+        $this->assertNotFalse($this->db->execute('CREATE TABLE foobar (label VARCHAR(50), tags JSONB)'));
+        $this->assertTrue($this->db->table('foobar')->insert(['label' => 'first',  'tags' => '["php","js","mysql"]']));
+        $this->assertTrue($this->db->table('foobar')->insert(['label' => 'second', 'tags' => '["python","django"]']));
+
+        // empty values must not generate invalid SQL — contains matches nothing
+        $this->assertEquals(0, $this->db->table('foobar')->jsonContains('tags', [])->count());
+        // ...and not-contains matches everything
+        $this->assertEquals(2, $this->db->table('foobar')->jsonNotContains('tags', [])->count());
+    }
 }

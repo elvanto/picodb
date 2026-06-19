@@ -543,6 +543,11 @@ class BaseConditionBuilder
      */
     public function jsonContains(string $column, array $values, ?string $path = null): void
     {
+        if (empty($values)) {
+            $this->addCondition('0 = 1');
+            return;
+        }
+
         [$sql, $bindings] = $this->db->getDriver()->buildJsonContainsCondition(
             $this->db->escapeIdentifier($column),
             $path !== null ? $this->normalizeJsonPath($path) : null,
@@ -566,6 +571,10 @@ class BaseConditionBuilder
      */
     public function jsonNotContains(string $column, array $values, ?string $path = null): void
     {
+        if (empty($values)) {
+            return;
+        }
+
         [$sql, $bindings] = $this->db->getDriver()->buildJsonContainsCondition(
             $this->db->escapeIdentifier($column),
             $path !== null ? $this->normalizeJsonPath($path) : null,
