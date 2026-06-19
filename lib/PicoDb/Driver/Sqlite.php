@@ -99,7 +99,7 @@ class Sqlite extends Base
         return '';
     }
 
-    public function buildJsonExtractCondition(string $column, string $path, string $operator = '='): string
+    public function buildJsonExtractCondition(string $column, string $path, string $operator): string
     {
         return 'JSON_EXTRACT('.$column.', \''.$path.'\') '.$operator.' ?';
     }

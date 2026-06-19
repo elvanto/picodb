@@ -154,7 +154,7 @@ class Postgres extends Base
         return ['{'.implode(',', $parts).'}', '#>>', '#>'];
     }
 
-    public function buildJsonExtractCondition(string $column, string $path, string $operator = '='): string
+    public function buildJsonExtractCondition(string $column, string $path, string $operator): string
     {
         [$pgPath, $textOp] = $this->convertJsonPath($path);
         return $column.$textOp."'".$pgPath."' ".$operator.' ?';

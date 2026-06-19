@@ -95,10 +95,10 @@ abstract class Base
      * @access public
      * @param  string  $column    Escaped column identifier
      * @param  string  $path      JSONPath expression (e.g. '$.key' or '$.key1.key2')
-     * @param  string  $operator  Comparison operator, defaults to '='
+     * @param  string  $operator  Comparison operator
      * @return string
      */
-    abstract public function buildJsonExtractCondition(string $column, string $path, string $operator = '='): string;
+    abstract public function buildJsonExtractCondition(string $column, string $path, string $operator): string;
 
     /**
      * Build a JSON array containment condition

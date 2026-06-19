@@ -507,7 +507,8 @@ class BaseConditionBuilder
     {
         $this->addCondition($this->db->getDriver()->buildJsonExtractCondition(
             $this->db->escapeIdentifier($column),
-            $this->normalizeJsonPath($path)
+            $this->normalizeJsonPath($path),
+            '='
         ));
         $this->values[] = $value;
     }
