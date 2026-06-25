@@ -178,6 +178,22 @@ class Mysql extends Base
         return '';
     }
 
+    public function buildJsonExtractCondition(string $column, string $path, string $operator): string
+    {
+        return 'JSON_UNQUOTE(JSON_EXTRACT('.$column.', \''.$path.'\')) '.$operator.' ?';
+    }
+
+    public function buildJsonContainsCondition(string $column, ?string $path, array $values): array
+    {
+        $placeholders = implode(', ', array_fill(0, count($values), '?'));
+
+        if ($path === null) {
+            return ['JSON_CONTAINS('.$column.', JSON_ARRAY('.$placeholders.'))', $values];
+        }
+
+        return ['JSON_CONTAINS(JSON_EXTRACT('.$column.', \''.$path.'\'), JSON_ARRAY('.$placeholders.'))', $values];
+    }
+
     /**
      * Get last inserted id
      *

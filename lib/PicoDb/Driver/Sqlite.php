@@ -98,6 +98,21 @@ class Sqlite extends Base
         return '';
     }
 
+    public function buildJsonExtractCondition(string $column, string $path, string $operator): string
+    {
+        return 'JSON_EXTRACT('.$column.', \''.$path.'\') '.$operator.' ?';
+    }
+
+    public function buildJsonContainsCondition(string $column, ?string $path, array $values): array
+    {
+        $count = count($values);
+        $placeholders = implode(', ', array_fill(0, $count, '?'));
+        $target = $path !== null ? 'JSON_EXTRACT('.$column.', \''.$path.'\')' : $column;
+        $sql = '(SELECT COUNT(*) FROM JSON_EACH('.$target.') WHERE value IN ('.$placeholders.')) = '.$count;
+
+        return [$sql, $values];
+    }
+
     /**
      * Get last inserted id
      *

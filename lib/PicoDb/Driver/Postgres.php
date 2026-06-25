@@ -130,6 +130,23 @@ class Postgres extends Base
         return '';
     }
 
+    public function buildJsonExtractCondition(string $column, string $path, string $operator): string
+    {
+        // jsonb_path_query_first() parses the JSONPath natively (PG 12+), so the full
+        // grammar is supported (nested keys, array subscripts, wildcards, filters).
+        // #>> '{}' unwraps the resulting scalar jsonb to text for comparison.
+        return 'jsonb_path_query_first('.$column.", '".$path."') #>> '{}' ".$operator.' ?';
+    }
+
+    public function buildJsonContainsCondition(string $column, ?string $path, array $values): array
+    {
+        if ($path === null) {
+            return [$column.' @> ?::jsonb', [json_encode($values)]];
+        }
+
+        return ['jsonb_path_query_first('.$column.", '".$path."') @> ?::jsonb", [json_encode($values)]];
+    }
+
     /**
      * Get last inserted id
      *
