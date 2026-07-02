@@ -102,6 +102,22 @@ class SqliteTableTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('SELECT * FROM "test"       LIMIT 5  OFFSET 10', $this->db->table('test')->offset(10)->limit(5)->buildSelectQuery());
     }
 
+    public function testLimitOffsetNeutralizesInjection()
+    {
+        $this->assertEquals(
+            'SELECT * FROM "test"       LIMIT 10',
+            $this->db->table('test')->limit('10; DROP TABLE users')->buildSelectQuery()
+        );
+        $this->assertEquals(
+            'SELECT * FROM "test"        OFFSET 5',
+            $this->db->table('test')->offset('5 UNION SELECT password FROM users')->buildSelectQuery()
+        );
+        $this->assertEquals(
+            'SELECT * FROM "test"       LIMIT 0',
+            $this->db->table('test')->limit("' OR '1'='1")->buildSelectQuery()
+        );
+    }
+
     public function testSubquery()
     {
         $this->assertEquals('SELECT (SELECT 1 FROM "foobar" WHERE 1=1) AS "b" FROM "test"', $this->db->table('test')->subquery('SELECT 1 FROM "foobar" WHERE 1=1', 'b')->buildSelectQuery());
