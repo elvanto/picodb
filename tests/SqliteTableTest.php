@@ -116,6 +116,13 @@ class SqliteTableTest extends \PHPUnit\Framework\TestCase
             'SELECT * FROM "test"       LIMIT 0',
             $this->db->table('test')->limit("' OR '1'='1")->buildSelectQuery()
         );
+        $this->assertEquals(
+            'SELECT * FROM "test"       LIMIT 5  OFFSET 10',
+            $this->db->table('test')
+                ->limit('5 UNION SELECT 1')
+                ->offset('10; DROP TABLE users')
+                ->buildSelectQuery()
+        );
     }
 
     public function testSubquery()
