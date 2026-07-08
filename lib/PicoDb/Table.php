@@ -751,7 +751,7 @@ class Table
     public function limit($value)
     {
         if (! is_null($value)) {
-            $this->sqlLimit = $value;
+            $this->sqlLimit = (int) $value;
         }
 
         return $this;
@@ -767,7 +767,7 @@ class Table
     public function offset($value)
     {
         if (! is_null($value)) {
-            $this->sqlOffset = $value;
+            $this->sqlOffset = (int) $value;
         }
 
         return $this;
